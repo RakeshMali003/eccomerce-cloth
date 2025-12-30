@@ -1,0 +1,138 @@
+
+           @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,600&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .bg-brand { background-color: #ea580c; }
+        .text-brand { color: #ea580c; }
+        .border-brand { border-color: #ea580c; }
+   
+   @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;700&display=swap');
+        
+        .font-serif { font-family: 'Playfair Display', serif; }
+        body { font-family: 'Inter', sans-serif; }
+
+        /* Animation for Process Steps */
+        .step-card:hover .step-number {
+            transform: scale(1.2) rotate(10deg);
+            background-color: #ea580c;
+            color: white;
+        }
+
+        
+     
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fadeIn 1s ease-out forwards;
+    }
+    
+    /* Smooth fonts */
+    .font-serif { font-family: 'Playfair Display', serif; }
+
+
+
+
+    /* Marquee Fast Forward */
+    @keyframes marqueeFast {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-100%); }
+    }
+    .animate-marquee-fast {
+        animation: marqueeFast 25s linear infinite;
+    }
+
+    /* Marquee Slow for Images */
+    @keyframes marqueeSlow {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-100%); }
+    }
+    .animate-marquee-slow {
+        animation: marqueeSlow 40s linear infinite;
+    }
+
+    /* Marquee Reverse Direction */
+    @keyframes marqueeReverse {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(0); }
+    }
+    .animate-marquee-reverse {
+        animation: marqueeReverse 30s linear infinite;
+    }
+
+    /* Pause on hover to allow users to look at products */
+    .animate-marquee-slow:hover {
+        animation-play-state: paused;
+    }
+
+
+
+
+    /* Professional Map Styling */
+    .grayscale-map {
+        filter: grayscale(100%) invert(5%) contrast(90%);
+        transition: all 0.6s ease-in-out;
+    }
+    .grayscale-map:hover {
+        filter: grayscale(0%) invert(0%) contrast(100%);
+    }
+
+    /* Font import for that 'Heritage' feel */
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,900;1,400&display=swap');
+    .font-serif { font-family: 'Playfair Display', serif; }
+
+
+    footer a {
+        display: inline-block;
+        transition: transform 0.2s ease;
+    }
+    footer a:hover {
+        transform: translateX(5px);
+    }
+
+       @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:ital,wght@1,700&display=swap');
+        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fff; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        
+        /* Custom Scrollbar for Sidebar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        
+        /* Image Zoom Animation */
+        .zoom-container:hover img { transform: scale(1.5); cursor: zoom-in; }
+        .zoom-container img { transition: transform 0.5s ease; }
+
+        /* Sticky Mobile Add to Cart */
+        @media (max-width: 768px) {
+            .mobile-sticky-cta {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 1rem;
+                box-shadow: 0 -10px 20px rgba(0,0,0,0.05);
+                z-index: 100;
+            }
+        }
+
+
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:ital,wght@1,700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-serif { font-family: 'Playfair Display', serif; }
+        
+        /* Product Card Hover Effects */
+        .product-card:hover .action-bar { transform: translateY(0); opacity: 1; }
+        .product-card img { transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+        .product-card:hover img { transform: scale(1.08); }
+        
+        /* Smooth Badge Animation */
+        .badge-zoom { transition: all 0.3s ease; }
+        .product-card:hover .badge-zoom { transform: scale(0.9); opacity: 0.8; }
+        
+        /* Hide Scrollbar for Sidebar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+
+
+  
