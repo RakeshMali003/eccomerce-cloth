@@ -4,9 +4,14 @@ require_once $base_path . 'config/database.php';
 require_once $base_path . 'includes/functions.php';
 
 include $base_path . 'includes/admin-header.php';
-include $base_path . 'includes/sidebar.php';
+include $base_path . 'includes/notifications.php';
 
-// ----- Customer Summary -----
+if (!has_permission('users')) {
+    echo "<script>alert('Access Denied'); window.location.href='../dashboard.php';</script>";
+    exit;
+}
+
+// 1. Pagination & Search ConfigSummary -----
 $statsQuery = "
     SELECT 
         COUNT(*) AS total_customers,
@@ -156,7 +161,8 @@ $customers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <td class="px-6 py-5">
                                 <p class="text-xs font-bold text-slate-700"><?php echo e($user['email']); ?></p>
                                 <p class="text-[10px] text-slate-400 font-bold">
-                                    <?php echo e($user['phone'] ?: 'No Phone'); ?></p>
+                                    <?php echo e($user['phone'] ?: 'No Phone'); ?>
+                                </p>
                             </td>
                             <td class="px-6 py-5 text-center">
                                 <div class="inline-flex flex-col">

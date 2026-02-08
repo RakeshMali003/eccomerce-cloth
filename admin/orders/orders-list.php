@@ -22,7 +22,14 @@ function getStatusStyle($status)
     };
 }
 
-// 2. Filter Logic
+// 1. Fetch Orders with Filters
+if (!has_permission('orders')) {
+    echo "<script>alert('Access Denied'); window.location.href='../dashboard.php';</script>";
+    exit;
+}
+
+$page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
+$limit = 10;
 $status_filter = $_GET['status'] ?? 'all';
 $search_query = $_GET['search'] ?? '';
 $where_clauses = [];

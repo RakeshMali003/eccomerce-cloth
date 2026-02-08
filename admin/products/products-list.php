@@ -7,6 +7,14 @@ include $base_path . 'includes/sidebar.php';
 include $base_path . 'includes/notifications.php';
 
 // 1. Pagination & Filter Config
+$current_category = isset($_GET['category']) ? $_GET['category'] : 'all';
+
+if (!has_permission('products')) {
+    echo "<script>alert('Access Denied'); window.location.href='../dashboard.php';</script>";
+    exit;
+}
+
+// Fetch Categories for Filtert = ($page - 1) * $limit;
 $page = isset($_GET['page']) ? (int) $_GET['page'] : 1;
 $limit = 10;
 $offset = ($page - 1) * $limit;

@@ -43,4 +43,36 @@ function get_user_initial()
 {
     return isset($_SESSION['user_name']) ? strtoupper(substr($_SESSION['user_name'], 0, 1)) : 'U';
 }
+
+// Permission Helper
+function has_permission($permission)
+{
+    global $pdo;
+
+    if (!isset($_SESSION['user_id']) && !isset($_SESSION['admin_id']))
+        return false;
+
+    // Super Admin Bypass
+    if (isset($_SESSION['admin_id'])) {
+        return true;
+    }
+
+    // Check Role
+    if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin')
+        return true;
+
+    // Fetch Permissions if not in session
+    if (!isset($_SESSION['permissions'])) {
+        $stmt = $pdo->prepare("SELECT permissions FROM workers WHERE user_id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $perms = $stmt->fetchColumn();
+        if ($perms) {
+            $_SESSION['permissions'] = json_decode($perms, true) ?? [];
+        } else {
+            $_SESSION['permissions'] = [];
+        }
+    }
+
+    return in_array($permission, $_SESSION['permissions']);
+}
 ?>

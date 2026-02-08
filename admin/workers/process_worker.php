@@ -30,12 +30,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // 2. Add to Workers
             $worker_role = $_POST['role'];
             $section = $_POST['section'];
+            $address = $_POST['address'] ?? null;
+            $contact = $_POST['contact_number'] ?? null;
+            $bank = $_POST['bank_details'] ?? null;
+            $salary = $_POST['salary'] ?? 0.00;
 
-            $stmt = $pdo->prepare("INSERT INTO workers (user_id, role, assigned_section, created_at) VALUES (?, ?, ?, NOW())");
-            $stmt->execute([$user_id, $worker_role, $section]);
+            // Permissions
+            $permissions = isset($_POST['permissions']) ? json_encode($_POST['permissions']) : json_encode([]);
+
+            // Handle File Uploads
+            $uploaded_docs = [];
+            if (isset($_FILES['documents']) && !empty($_FILES['documents']['name'][0])) {
+                $target_dir = "../../assets/uploads/workers/";
+                if (!file_exists($target_dir)) {
+                    mkdir($target_dir, 0777, true);
+                }
+
+                foreach ($_FILES['documents']['tmp_name'] as $key => $tmp_name) {
+                    $file_name = $_FILES['documents']['name'][$key];
+                    $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                    $unique_name = uniqid() . '.' . $file_ext;
+                    $target_file = $target_dir . $unique_name;
+
+                    if (move_uploaded_file($tmp_name, $target_file)) {
+                        $uploaded_docs[] = $unique_name;
+                    }
+                }
+            }
+            $docs_json = json_encode($uploaded_docs);
+
+            $stmt = $pdo->prepare("INSERT INTO workers (user_id, role, assigned_section, address, contact_number, documents, bank_details, salary, permissions, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())");
+            $stmt->execute([$user_id, $worker_role, $section, $address, $contact, $docs_json, $bank, $salary, $permissions]);
 
             $pdo->commit();
-            $_SESSION['success'] = "Worker added successfully.";
+            $_SESSION['success'] = "Worker added successfully with all details.";
 
         } elseif ($action === 'delete') {
             $worker_id = (int) $_POST['worker_id'];

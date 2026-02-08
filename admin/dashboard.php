@@ -4,6 +4,11 @@ require_once $base_path . "config/database.php";
 include $base_path . 'includes/admin-header.php';
 include $base_path . 'includes/sidebar.php';
 
+if (!has_permission('dashboard')) {
+    echo "<h1>Access Denied</h1><p>Contact Administrator.</p>";
+    exit;
+}
+
 // 1. Fetch Key Metrics
 $today_sales = $pdo->query("SELECT SUM(total_amount) FROM orders WHERE DATE(created_at) = CURDATE() AND order_status != 'cancelled'")->fetchColumn() ?? 0;
 $today_orders = $pdo->query("SELECT COUNT(*) FROM orders WHERE DATE(created_at) = CURDATE()")->fetchColumn() ?? 0;

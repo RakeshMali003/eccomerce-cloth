@@ -2,6 +2,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+require_once __DIR__ . '/functions.php';
 
 // Security Check: Only admins allowed
 if (!isset($_SESSION['admin_id'])) {

@@ -6,6 +6,11 @@ require_once $base_path . 'includes/functions.php';
 include $base_path . 'includes/admin-header.php';
 include $base_path . 'includes/sidebar.php';
 
+if (!has_permission('workers')) {
+    echo "<script>alert('Access Denied'); window.location.href='../../dashboard.php';</script>";
+    exit;
+}
+
 // Fetch Workers
 $stmt = $pdo->prepare("
     SELECT w.*, u.name, u.email, u.phone, u.status 
@@ -112,32 +117,45 @@ $workers = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <h3 class="text-2xl font-black tracking-tight mb-2">Onboard Staff</h3>
         <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-8">Create new worker profile</p>
 
-        <form action="process_worker.php" method="POST" class="space-y-6">
+        <form action="process_worker.php" method="POST" enctype="multipart/form-data" class="space-y-6">
             <input type="hidden" name="action" value="add">
 
-            <div class="space-y-1">
-                <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Full Name</label>
-                <input type="text" name="name" required
-                    class="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-500/20 font-semibold outline-none">
-            </div>
-
             <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Full Name</label>
+                    <input type="text" name="name" required
+                        class="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-500/20 font-semibold outline-none">
+                </div>
                 <div class="space-y-1">
                     <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Email</label>
                     <input type="email" name="email" required
                         class="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-500/20 font-semibold outline-none">
                 </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-1">
                     <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Phone</label>
                     <input type="text" name="phone" required
                         class="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-500/20 font-semibold outline-none">
                 </div>
+                <div class="space-y-1">
+                    <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Alternate Contact</label>
+                    <input type="text" name="contact_number"
+                        class="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-500/20 font-semibold outline-none">
+                </div>
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Address</label>
+                <textarea name="address" rows="2"
+                    class="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-500/20 font-semibold outline-none"></textarea>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
                 <div class="space-y-1">
                     <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Role</label>
-                    <select name="role"
+                    <select name="role" required
                         class="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-500/20 font-bold text-xs outline-none">
                         <option value="Manager">Manager</option>
                         <option value="Staff">Staff</option>
@@ -153,6 +171,58 @@ $workers = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <option value="Inventory">Inventory</option>
                         <option value="Support">Support</option>
                     </select>
+                </div>
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Salary</label>
+                <input type="number" name="salary" step="0.01" placeholder="0.00"
+                    class="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-500/20 font-semibold outline-none">
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Bank / Payment Details</label>
+                <textarea name="bank_details" rows="2" placeholder="Bank Name, Account No, IFSC..."
+                    class="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-orange-500/20 font-semibold outline-none"></textarea>
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Documents (ID, Resume)</label>
+                <input type="file" name="documents[]" multiple
+                    class="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none text-xs font-bold text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-slate-900 file:text-white hover:file:bg-orange-600 transition-all cursor-pointer">
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-[10px] font-black uppercase text-slate-400 ml-2">Access Permissions</label>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-2xl">
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700">
+                        <input type="checkbox" name="permissions[]" value="dashboard" checked
+                            class="w-4 h-4 rounded text-orange-600 focus:ring-orange-500"> Dashboard
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700">
+                        <input type="checkbox" name="permissions[]" value="orders"
+                            class="w-4 h-4 rounded text-orange-600 focus:ring-orange-500"> Orders
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700">
+                        <input type="checkbox" name="permissions[]" value="products"
+                            class="w-4 h-4 rounded text-orange-600 focus:ring-orange-500"> Products
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700">
+                        <input type="checkbox" name="permissions[]" value="users"
+                            class="w-4 h-4 rounded text-orange-600 focus:ring-orange-500"> Users
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700">
+                        <input type="checkbox" name="permissions[]" value="reports"
+                            class="w-4 h-4 rounded text-orange-600 focus:ring-orange-500"> Reports
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700">
+                        <input type="checkbox" name="permissions[]" value="settings"
+                            class="w-4 h-4 rounded text-orange-600 focus:ring-orange-500"> Settings
+                    </label>
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-700">
+                        <input type="checkbox" name="permissions[]" value="workers"
+                            class="w-4 h-4 rounded text-orange-600 focus:ring-orange-500"> Manage Workers
+                    </label>
                 </div>
             </div>
 
