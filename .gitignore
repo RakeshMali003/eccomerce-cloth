@@ -1,0 +1,6 @@
+config/.env.php
+assets/images/products/*
+!assets/images/products/default.png
+logs/*.log
+vendor/
+.env

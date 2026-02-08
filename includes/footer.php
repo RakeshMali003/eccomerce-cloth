@@ -1,81 +1,69 @@
-
-
 <footer class="bg-zinc-900 text-white pt-24 pb-12">
     <div class="container mx-auto px-4 md:px-10">
-        
-        <div class="bg-orange-600 rounded-[3rem] p-8 md:p-16 flex flex-col lg:flex-row items-center justify-between gap-10 mb-24">
-            <div class="lg:max-w-xl text-center lg:text-left">
-                <h3 class="text-3xl md:text-5xl font-black mb-4">Stay Updated With Us</h3>
-                <p class="text-orange-100 font-light">Get exclusive deals, new product launches, wholesale offers, and festival discounts.</p>
+
+        <div
+            class="bg-yellow-500 rounded-[3rem] p-8 md:p-16 flex flex-col lg:flex-row items-center justify-between gap-10 mb-24">
+            <div class="lg:max-w-xl text-center lg:text-left text-black">
+                <h3 class="text-3xl md:text-5xl font-black mb-4">Need Electrical Items?</h3>
+                <p class="text-zinc-800 font-medium">Get best rates for home & shop electrical materials. Authorized HPL
+                    Distributor.</p>
             </div>
             <div class="w-full lg:w-auto">
-                <form class="flex flex-col sm:flex-row gap-3">
-                    <input type="email" placeholder="Your email address" class="px-8 py-5 rounded-full bg-white text-black border-none w-full lg:w-80 focus:ring-4 focus:ring-orange-400 transition-all">
-                    <button class="bg-black text-white px-10 py-5 rounded-full font-bold hover:bg-zinc-800 transition-all whitespace-nowrap">
-                        Subscribe
-                    </button>
-                </form>
+                <a href="tel:6386517300"
+                    class="inline-block bg-black text-white px-10 py-5 rounded-full font-bold hover:bg-zinc-800 transition-all whitespace-nowrap shadow-xl">
+                    Call: 6386517300
+                </a>
             </div>
         </div>
 
-
-
-
-
-
-
-
-
-
-
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-16 border-b border-zinc-800 text-center md:text-left">
             <div class="flex items-center gap-4 justify-center md:justify-start">
-                <div class="w-14 h-14 rounded-full bg-zinc-900 flex items-center justify-center text-orange-600 text-2xl border border-zinc-800">
-                    <i class="fas fa-award"></i>
+                <div
+                    class="w-14 h-14 rounded-full bg-zinc-900 flex items-center justify-center text-yellow-500 text-2xl border border-zinc-800">
+                    <i class="fas fa-certificate"></i>
                 </div>
                 <div>
-                    <h5 class="font-bold uppercase tracking-widest text-sm">Quality Guaranteed</h5>
-                    <p class="text-zinc-500 text-xs">Direct Factory-Inspected Goods</p>
+                    <h5 class="font-bold uppercase tracking-widest text-sm">Authorized Distributor</h5>
+                    <p class="text-zinc-500 text-xs">Genuine HPL Products</p>
                 </div>
             </div>
             <div class="flex items-center gap-4 justify-center md:justify-start">
-                <div class="w-14 h-14 rounded-full bg-zinc-900 flex items-center justify-center text-orange-600 text-2xl border border-zinc-800">
-                    <i class="fas fa-shield-alt"></i>
+                <div
+                    class="w-14 h-14 rounded-full bg-zinc-900 flex items-center justify-center text-yellow-500 text-2xl border border-zinc-800">
+                    <i class="fas fa-tags"></i>
                 </div>
                 <div>
-                    <h5 class="font-bold uppercase tracking-widest text-sm">Secure Payments</h5>
-                    <p class="text-zinc-500 text-xs">SSL Encrypted Transactions</p>
+                    <h5 class="font-bold uppercase tracking-widest text-sm">Best Prices</h5>
+                    <p class="text-zinc-500 text-xs">Wholesale & Retail Rates</p>
                 </div>
             </div>
             <div class="flex items-center gap-4 justify-center md:justify-start">
-                <div class="w-14 h-14 rounded-full bg-zinc-900 flex items-center justify-center text-orange-600 text-2xl border border-zinc-800">
-                    <i class="fas fa-truck-loading"></i>
+                <div
+                    class="w-14 h-14 rounded-full bg-zinc-900 flex items-center justify-center text-yellow-500 text-2xl border border-zinc-800">
+                    <i class="fas fa-user-shield"></i>
                 </div>
                 <div>
-                    <h5 class="font-bold uppercase tracking-widest text-sm">All India Delivery</h5>
-                    <p class="text-zinc-500 text-xs">Reliable Wholesale Logistics</p>
+                    <h5 class="font-bold uppercase tracking-widest text-sm">Expert Advice</h5>
+                    <p class="text-zinc-500 text-xs">By Dr. Praveen Joshi</p>
                 </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 py-16">
-            
+
             <div class="lg:col-span-4">
                 <div class="mb-6">
-                    <h2 class="text-3xl font-black tracking-tighter text-white uppercase">GURUKRUPA</h2>
-                    <span class="text-[10px] uppercase tracking-[0.4em] text-orange-600 font-bold block mt-1">Weaves of Grace</span>
+                    <h2 class="text-3xl font-black tracking-tighter text-white uppercase">JOSHI ELECTRICAL</h2>
+                    <span class="text-[10px] uppercase tracking-[0.4em] text-yellow-500 font-bold block mt-1">Trusted
+                        Store Since 2024</span>
                 </div>
                 <p class="text-zinc-400 text-sm leading-relaxed mb-8 max-w-sm">
-                    Your trusted partner for quality clothing — serving retail customers and wholesale businesses across India with premium garments at factory-direct prices.
+                    Your one-stop shop for all electrical appliances and fittings. We provide genuine branded products
+                    for homes, shops, and projects.
                 </p>
                 <div class="flex gap-4">
-                    <a href="#" class="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-orange-600 transition-all duration-300">
-                        <i class="fab fa-facebook-f text-sm"></i>
-                    </a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-orange-600 transition-all duration-300">
-                        <i class="fab fa-instagram text-sm"></i>
-                    </a>
-                    <a href="#" class="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-orange-600 transition-all duration-300">
+                    <a href="https://wa.me/919956510247"
+                        class="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-yellow-500 hover:text-black transition-all duration-300">
                         <i class="fab fa-whatsapp text-sm"></i>
                     </a>
                 </div>
@@ -84,58 +72,63 @@
             <div class="lg:col-span-2">
                 <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white mb-8">Quick Links</h4>
                 <ul class="space-y-4">
-                    <li><a href="#" class="text-zinc-500 hover:text-orange-500 text-sm transition-colors">Home</a></li>
-                    <li><a href="#" class="text-zinc-500 hover:text-orange-500 text-sm transition-colors">About Us</a></li>
-                    <li><a href="#" class="text-zinc-500 hover:text-orange-500 text-sm transition-colors">Products</a></li>
-                    <li><a href="#" class="text-zinc-500 hover:text-orange-500 text-sm transition-colors">Wholesale</a></li>
-                    <li><a href="#" class="text-zinc-500 hover:text-orange-500 text-sm transition-colors">Contact</a></li>
+                    <li><a href="<?php echo $base_url; ?>index.php"
+                            class="text-zinc-500 hover:text-yellow-500 text-sm transition-colors">Home</a></li>
+                    <li><a href="<?php echo $base_url; ?>pages/about.php"
+                            class="text-zinc-500 hover:text-yellow-500 text-sm transition-colors">About Us</a></li>
+                    <li><a href="<?php echo $base_url; ?>pages/products/product-list.php"
+                            class="text-zinc-500 hover:text-yellow-500 text-sm transition-colors">Products</a></li>
+                    <li><a href="<?php echo $base_url; ?>pages/wholesale.php"
+                            class="text-zinc-500 hover:text-yellow-500 text-sm transition-colors">Wholesale</a></li>
+                    <li><a href="<?php echo $base_url; ?>pages/contact.php"
+                            class="text-zinc-500 hover:text-yellow-500 text-sm transition-colors">Contact</a></li>
                 </ul>
             </div>
 
             <div class="lg:col-span-3">
-                <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white mb-8">Categories</h4>
+                <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white mb-8">Products</h4>
                 <ul class="space-y-4">
-                    <li><a href="#" class="text-zinc-500 hover:text-orange-500 text-sm transition-colors">Men's Wear</a></li>
-                    <li><a href="#" class="text-zinc-500 hover:text-orange-500 text-sm transition-colors">Women's Wear</a></li>
-                    <li><a href="#" class="text-zinc-500 hover:text-orange-500 text-sm transition-colors">Kids' Wear</a></li>
-                    <li><a href="#" class="text-zinc-500 hover:text-orange-500 text-sm transition-colors">New Arrivals</a></li>
-                    <li><a href="#" class="text-zinc-500 hover:text-orange-500 text-sm transition-colors font-bold">Bulk Orders</a></li>
+                    <li><a href="#" class="text-zinc-500 hover:text-yellow-500 text-sm transition-colors">Modular
+                            Switches</a></li>
+                    <li><a href="#" class="text-zinc-500 hover:text-yellow-500 text-sm transition-colors">LED Lights &
+                            Fans</a></li>
+                    <li><a href="#" class="text-zinc-500 hover:text-yellow-500 text-sm transition-colors">Wires &
+                            Cables</a></li>
+                    <li><a href="#" class="text-zinc-500 hover:text-yellow-500 text-sm transition-colors">Inverters &
+                            Batteries</a></li>
+                    <li><a href="#"
+                            class="text-zinc-500 hover:text-yellow-500 text-sm transition-colors font-bold">Project
+                            Supply</a></li>
                 </ul>
             </div>
 
             <div class="lg:col-span-3">
-                <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white mb-8">Policies</h4>
+                <h4 class="text-xs font-black uppercase tracking-[0.2em] text-white mb-8">Contact</h4>
                 <ul class="space-y-4">
-                    <li><a href="#" class="text-zinc-500 hover:text-orange-500 text-sm transition-colors">Privacy Policy</a></li>
-                    <li><a href="#" class="text-zinc-500 hover:text-orange-500 text-sm transition-colors">Shipping Policy</a></li>
-                    <li><a href="#" class="text-zinc-500 hover:text-orange-500 text-sm transition-colors">Return & Exchange</a></li>
-                    <li><a href="#" class="text-zinc-500 hover:text-orange-500 text-sm transition-colors">Wholesale Terms</a></li>
-                    <li><a href="#" class="text-zinc-500 hover:text-orange-500 text-sm transition-colors">Secure Payments</a></li>
+                    <li class="text-zinc-500 text-sm">Dr. Praveen Joshi</li>
+                    <li class="text-zinc-500 text-sm">6386517300, 9956510247</li>
+                    <li class="text-zinc-500 text-sm">7007465665</li>
+                    <li class="text-zinc-500 text-sm">[Location Name, City]</li>
                 </ul>
             </div>
         </div>
 
         <div class="py-8 border-t border-zinc-900 flex flex-col md:flex-row justify-between items-center gap-6">
             <p class="text-zinc-600 text-[10px] uppercase tracking-widest text-center md:text-left">
-                © 2025 Gurukrupa Wholesale Depot. All Rights Reserved.
+                © 2026 Joshi Electrical. All Rights Reserved.
             </p>
-            
-            <div class="flex items-center gap-6 opacity-30 grayscale hover:grayscale-0 transition-all duration-500">
-                <i class="fab fa-cc-visa text-2xl"></i>
-                <i class="fab fa-cc-mastercard text-2xl"></i>
-                <i class="fab fa-cc-apple-pay text-2xl"></i>
-                <i class="fab fa-cc-amazon-pay text-2xl"></i>
-            </div>
-            
+
             <p class="text-zinc-600 text-[10px] uppercase tracking-widest">
-                Handcrafted in India
+                Authorized HPL Distributor
             </p>
         </div>
     </div>
-     <a href="https://wa.me/7600404831" class="fixed bottom-8 right-8 bg-[#25D366] text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-2xl hover:scale-110 transition-transform z-[100]">
+    <a href="https://wa.me/919956510247"
+        class="fixed bottom-8 right-8 bg-[#25D366] text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-2xl hover:scale-110 transition-transform z-[100]">
         <i class="fab fa-whatsapp"></i>
     </a>
 </footer>
 
 </body>
+
 </html>

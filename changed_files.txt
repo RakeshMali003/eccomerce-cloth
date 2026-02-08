@@ -1,0 +1,10 @@
+﻿C:\xampp\htdocs\ecommerce-website\changed_files.txt
+C:\xampp\htdocs\ecommerce-website\admin\products\add-product.php
+C:\xampp\htdocs\ecommerce-website\includes\functions.php
+C:\xampp\htdocs\ecommerce-website\includes\header.php
+C:\xampp\htdocs\ecommerce-website\pages\auth\login.php
+C:\xampp\htdocs\ecommerce-website\pages\auth\register.php
+C:\xampp\htdocs\ecommerce-website\pages\cart\cart.php
+C:\xampp\htdocs\ecommerce-website\pages\orders\order-tracking.php
+C:\xampp\htdocs\ecommerce-website\pages\products\product-list.php
+C:\xampp\htdocs\ecommerce-website\pages\products\search.php
