@@ -1,8 +1,9 @@
 <?php
 session_start();
 require_once 'config/database.php';
-require_once 'config/constants.php';
+require_once 'config/config.php';
 require_once 'includes/functions.php';
+require_once 'includes/cms_helper.php';
 
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 include 'includes/header.php';
@@ -44,7 +45,7 @@ $new_arrivals = $pdo->query("
             <div
                 class="md:col-span-8 relative rounded-[2.5rem] overflow-hidden h-[500px] md:h-[600px] group shadow-xl bg-zinc-900">
                 <!-- Electrical Theme Background -->
-                <img src="https://images.unsplash.com/photo-1555963966-b7ae5404f6fc?auto=format&fit=crop&q=80&w=1200"
+                <img src="<?= get_cms_content('home', 'hero_image', 'https://images.unsplash.com/photo-1555963966-b7ae5404f6fc?auto=format&fit=crop&q=80&w=1200') ?>"
                     class="w-full h-full object-cover opacity-60 transition-transform duration-1000 group-hover:scale-110"
                     alt="Electrical Shop">
 
@@ -55,10 +56,10 @@ $new_arrivals = $pdo->query("
                         Authorized HPL Distributor
                     </div>
                     <h1 class="text-white text-4xl md:text-7xl font-sans font-bold mb-4 leading-tight">
-                        Power Your <br><span class="text-yellow-500">World Safely</span>
+                        <?= get_cms_content('home', 'hero_title', 'Power Your <br><span class="text-yellow-500">World Safely</span>') ?>
                     </h1>
                     <p class="text-gray-300 text-lg mb-8 max-w-lg">
-                        Premium Switches, Wires, LED Lights & MCBs from top brands like HPL, Anchor, Polycab & Havells.
+                        <?= get_cms_content('home', 'hero_desc', 'Premium Switches, Wires, LED Lights & MCBs from top brands like HPL, Anchor, Polycab & Havells.') ?>
                     </p>
                     <div class="flex flex-wrap gap-4">
                         <a href="#products"
@@ -163,15 +164,14 @@ $new_arrivals = $pdo->query("
 
             <div class="lg:w-1/2">
                 <span class="text-yellow-600 font-bold uppercase tracking-widest text-xs mb-2 block">About Us</span>
-                <h2 class="text-4xl md:text-5xl font-black text-zinc-900 mb-6">Welcome to <br>Joshi Electrical</h2>
+                <h2 class="text-4xl md:text-5xl font-black text-zinc-900 mb-6">
+                    <?= get_cms_content('home', 'intro_title', 'Welcome to <br>Joshi Electrical') ?>
+                </h2>
                 <p class="text-zinc-500 text-lg leading-relaxed mb-6">
-                    Founded by <strong>Dr. Praveen Joshi</strong>, we are a trusted name in electrical supplies. As an
-                    <strong>Authorized Distributor for HPL</strong>, we bring you the safest and most reliable
-                    electrical components for your home and business.
+                    <?= get_cms_content('home', 'intro_text', 'Founded by <strong>Dr. Praveen Joshi</strong>, we are a trusted name in electrical supplies. As an <strong>Authorized Distributor for HPL</strong>, we bring you the safest and most reliable electrical components for your home and business.') ?>
                 </p>
                 <p class="text-zinc-500 text-lg leading-relaxed mb-8">
-                    From modular switches to heavy-duty industrial cables, we stock everything you need under one roof.
-                    Quality and customer safety are our top priorities.
+                    <?= get_cms_content('home', 'intro_text_2', 'From modular switches to heavy-duty industrial cables, we stock everything you need under one roof. Quality and customer safety are our top priorities.') ?>
                 </p>
                 <div class="flex gap-4">
                     <a href="pages/about.php"
@@ -192,45 +192,84 @@ $new_arrivals = $pdo->query("
         </div>
 
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            <!-- Category 1 -->
-            <a href="#" class="group block text-center">
+            <!-- Category 1: Switches -->
+            <a href="pages/products/product-list.php?category=Switches"
+                class="group block relative overflow-hidden rounded-[2.5rem] h-80">
+                <img src="https://images.unsplash.com/photo-1556636530-6b7482d80e3d?auto=format&fit=crop&q=80&w=600"
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    alt="Switches">
                 <div
-                    class="relative aspect-square rounded-[2.5rem] overflow-hidden mb-4 bg-white border border-gray-100 p-6 flex items-center justify-center group-hover:border-yellow-500 transition-all">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3663/3663508.png"
-                        class="w-24 h-24 object-contain opacity-60 group-hover:scale-110 group-hover:opacity-100 transition-all"
-                        alt="Switches">
+                    class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-8 flex flex-col justify-end">
+                    <div
+                        class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center mb-4 text-zinc-900 text-xl">
+                        <i class="fas fa-toggle-on"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white group-hover:text-yellow-400 transition-colors">Modular
+                        Switches</h4>
+                    <p
+                        class="text-zinc-300 text-xs mt-2 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-4 group-hover:translate-y-0 duration-300">
+                        Stylish & Durable</p>
                 </div>
-                <h4 class="font-bold text-zinc-900 group-hover:text-yellow-600 transition-colors">Modular Switches</h4>
             </a>
-            <!-- Category 2 -->
-            <a href="#" class="group block text-center">
+
+            <!-- Category 2: Wires -->
+            <a href="pages/products/product-list.php?category=Wires"
+                class="group block relative overflow-hidden rounded-[2.5rem] h-80">
+                <img src="https://images.unsplash.com/photo-1627960393049-3a6d47dd073c?auto=format&fit=crop&q=80&w=600"
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    alt="Wires">
                 <div
-                    class="relative aspect-square rounded-[2.5rem] overflow-hidden mb-4 bg-white border border-gray-100 p-6 flex items-center justify-center group-hover:border-yellow-500 transition-all">
-                    <img src="https://cdn-icons-png.flaticon.com/512/3558/3558485.png"
-                        class="w-24 h-24 object-contain opacity-60 group-hover:scale-110 group-hover:opacity-100 transition-all"
-                        alt="Wires">
+                    class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-8 flex flex-col justify-end">
+                    <div
+                        class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center mb-4 text-zinc-900 text-xl">
+                        <i class="fas fa-bezier-curve"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white group-hover:text-yellow-400 transition-colors">Wires &
+                        Cables</h4>
+                    <p
+                        class="text-zinc-300 text-xs mt-2 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-4 group-hover:translate-y-0 duration-300">
+                        FR & Zero Halogen</p>
                 </div>
-                <h4 class="font-bold text-zinc-900 group-hover:text-yellow-600 transition-colors">Wires & Cables</h4>
             </a>
-            <!-- Category 3 -->
-            <a href="#" class="group block text-center">
+
+            <!-- Category 3: Lighting -->
+            <a href="pages/products/product-list.php?category=Lighting"
+                class="group block relative overflow-hidden rounded-[2.5rem] h-80">
+                <img src="https://images.unsplash.com/photo-1565814329452-e1efa11c5b89?auto=format&fit=crop&q=80&w=600"
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    alt="Lighting">
                 <div
-                    class="relative aspect-square rounded-[2.5rem] overflow-hidden mb-4 bg-white border border-gray-100 p-6 flex items-center justify-center group-hover:border-yellow-500 transition-all">
-                    <img src="https://cdn-icons-png.flaticon.com/512/702/702814.png"
-                        class="w-24 h-24 object-contain opacity-60 group-hover:scale-110 group-hover:opacity-100 transition-all"
-                        alt="Lighting">
+                    class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-8 flex flex-col justify-end">
+                    <div
+                        class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center mb-4 text-zinc-900 text-xl">
+                        <i class="far fa-lightbulb"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white group-hover:text-yellow-400 transition-colors">LED Lighting
+                    </h4>
+                    <p
+                        class="text-zinc-300 text-xs mt-2 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-4 group-hover:translate-y-0 duration-300">
+                        Energy Efficient</p>
                 </div>
-                <h4 class="font-bold text-zinc-900 group-hover:text-yellow-600 transition-colors">LED Lights</h4>
             </a>
-            <!-- Category 4 -->
-            <a href="#" class="group block text-center">
+
+            <!-- Category 4: MCB -->
+            <a href="pages/products/product-list.php?category=Safety"
+                class="group block relative overflow-hidden rounded-[2.5rem] h-80">
+                <img src="https://plus.unsplash.com/premium_photo-1678822987158-b08e50529d3c?q=80&w=2070&auto=format&fit=crop"
+                    class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    alt="MCB">
                 <div
-                    class="relative aspect-square rounded-[2.5rem] overflow-hidden mb-4 bg-white border border-gray-100 p-6 flex items-center justify-center group-hover:border-yellow-500 transition-all">
-                    <img src="https://cdn-icons-png.flaticon.com/512/2926/2926723.png"
-                        class="w-24 h-24 object-contain opacity-60 group-hover:scale-110 group-hover:opacity-100 transition-all"
-                        alt="MCB">
+                    class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-8 flex flex-col justify-end">
+                    <div
+                        class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center mb-4 text-zinc-900 text-xl">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h4 class="text-2xl font-bold text-white group-hover:text-yellow-400 transition-colors">MCB & Safety
+                    </h4>
+                    <p
+                        class="text-zinc-300 text-xs mt-2 opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-4 group-hover:translate-y-0 duration-300">
+                        Switchgear & Protection</p>
                 </div>
-                <h4 class="font-bold text-zinc-900 group-hover:text-yellow-600 transition-colors">MCB & Safety</h4>
             </a>
         </div>
 
@@ -268,9 +307,11 @@ $new_arrivals = $pdo->query("
                         <div
                             class="relative aspect-[4/5] overflow-hidden rounded-[2rem] bg-zinc-100 mb-6 border border-zinc-100">
                             <!-- Use PHP to get image, fallback to a generic electrical placeholder if needed -->
-                            <img src="<?= get_product_image($product['main_image']) ?>"
-                                class="w-full h-full object-cover p-8 group-hover:scale-105 transition-all duration-500"
-                                alt="<?= htmlspecialchars($product['name']) ?>">
+                            <a href="pages/products/product-details.php?id=<?= $product['product_id'] ?>">
+                                <img src="<?= get_product_image($product['main_image']) ?>"
+                                    class="w-full h-full object-cover p-8 group-hover:scale-105 transition-all duration-500"
+                                    alt="<?= htmlspecialchars($product['name']) ?>">
+                            </a>
 
                             <?php if ($product['discount_percent'] > 0): ?>
                                 <span
@@ -299,28 +340,63 @@ $new_arrivals = $pdo->query("
     </div>
 </section>
 
-<!-- Brands Marquee -->
-<section class="bg-zinc-900 py-16 overflow-hidden">
-    <div class="container mx-auto px-4 mb-8 text-center">
-        <h2 class="text-xs font-black tracking-[0.4em] text-yellow-500 uppercase mb-2">Our Brands</h2>
-        <p class="text-3xl text-white font-bold">Trusted Partners</p>
-    </div>
+<!-- Brands Grid -->
+<section class="bg-zinc-900 py-20 overflow-hidden">
+    <div class="container mx-auto px-4 text-center">
+        <div class="mb-12">
+            <h2 class="text-xs font-black tracking-[0.4em] text-yellow-500 uppercase mb-2">Verified Partners</h2>
+            <p class="text-3xl text-white font-bold">Authorized Distributors For</p>
+        </div>
 
-    <div class="relative flex overflow-x-hidden border-y border-zinc-800 py-8 bg-black/20">
-        <div class="animate-marquee-fast flex whitespace-nowrap gap-16 items-center">
-            <span class="text-4xl font-black text-zinc-700 uppercase hover:text-white transition-colors">HPL</span>
-            <span class="text-4xl font-black text-zinc-700 uppercase hover:text-white transition-colors">Anchor</span>
-            <span class="text-4xl font-black text-zinc-700 uppercase hover:text-white transition-colors">Polycab</span>
-            <span class="text-4xl font-black text-zinc-700 uppercase hover:text-white transition-colors">Havells</span>
-            <span class="text-4xl font-black text-zinc-700 uppercase hover:text-white transition-colors">Philips</span>
-            <span class="text-4xl font-black text-zinc-700 uppercase hover:text-white transition-colors">Crompton</span>
-            <span class="text-4xl font-black text-zinc-700 uppercase hover:text-white transition-colors">Syska</span>
-            <span class="text-4xl font-black text-zinc-700 uppercase hover:text-white transition-colors">Bajaj</span>
-            <!-- Duplicate for loop -->
-            <span class="text-4xl font-black text-zinc-700 uppercase hover:text-white transition-colors">HPL</span>
-            <span class="text-4xl font-black text-zinc-700 uppercase hover:text-white transition-colors">Anchor</span>
-            <span class="text-4xl font-black text-zinc-700 uppercase hover:text-white transition-colors">Polycab</span>
-            <span class="text-4xl font-black text-zinc-700 uppercase hover:text-white transition-colors">Havells</span>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 px-4 md:px-0">
+            <!-- Brand Item -->
+            <div
+                class="bg-zinc-800 h-24 rounded-xl flex items-center justify-center hover:bg-white hover:scale-105 transition-all duration-300 group cursor-pointer">
+                <span
+                    class="text-2xl font-black text-zinc-500 group-hover:text-black tracking-widest uppercase">HPL</span>
+            </div>
+            <!-- Brand Item -->
+            <div
+                class="bg-zinc-800 h-24 rounded-xl flex items-center justify-center hover:bg-white hover:scale-105 transition-all duration-300 group cursor-pointer">
+                <span
+                    class="text-2xl font-black text-zinc-500 group-hover:text-[#da291c] tracking-widest uppercase">Anchor</span>
+            </div>
+            <!-- Brand Item -->
+            <div
+                class="bg-zinc-800 h-24 rounded-xl flex items-center justify-center hover:bg-white hover:scale-105 transition-all duration-300 group cursor-pointer">
+                <span
+                    class="text-2xl font-black text-zinc-500 group-hover:text-[#e31e24] tracking-widest uppercase">Polycab</span>
+            </div>
+            <!-- Brand Item -->
+            <div
+                class="bg-zinc-800 h-24 rounded-xl flex items-center justify-center hover:bg-white hover:scale-105 transition-all duration-300 group cursor-pointer">
+                <span
+                    class="text-2xl font-black text-zinc-500 group-hover:text-[#ec1c24] tracking-widest uppercase">Havells</span>
+            </div>
+            <!-- Brand Item -->
+            <div
+                class="bg-zinc-800 h-24 rounded-xl flex items-center justify-center hover:bg-white hover:scale-105 transition-all duration-300 group cursor-pointer">
+                <span
+                    class="text-2xl font-black text-zinc-500 group-hover:text-[#0b5ed7] tracking-widest uppercase">Philips</span>
+            </div>
+            <!-- Brand Item -->
+            <div
+                class="bg-zinc-800 h-24 rounded-xl flex items-center justify-center hover:bg-white hover:scale-105 transition-all duration-300 group cursor-pointer">
+                <span
+                    class="text-2xl font-black text-zinc-500 group-hover:text-[#005eb8] tracking-widest uppercase">Crompton</span>
+            </div>
+            <!-- Brand Item -->
+            <div
+                class="bg-zinc-800 h-24 rounded-xl flex items-center justify-center hover:bg-white hover:scale-105 transition-all duration-300 group cursor-pointer">
+                <span
+                    class="text-2xl font-black text-zinc-500 group-hover:text-green-600 tracking-widest uppercase">Syska</span>
+            </div>
+            <!-- Brand Item -->
+            <div
+                class="bg-zinc-800 h-24 rounded-xl flex items-center justify-center hover:bg-white hover:scale-105 transition-all duration-300 group cursor-pointer">
+                <span
+                    class="text-2xl font-black text-zinc-500 group-hover:text-[#00558e] tracking-widest uppercase">Bajaj</span>
+            </div>
         </div>
     </div>
 </section>

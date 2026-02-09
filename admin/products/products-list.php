@@ -64,34 +64,41 @@ $suppliers = $pdo->query("SELECT supplier_id, name FROM suppliers WHERE status =
     <div class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
             <h2 class="text-3xl font-black tracking-tighter text-slate-900">Master Catalog<span
-                    class="text-cyan-600">.</span></h2>
+                    class="text-orange-600">.</span></h2>
             <p class="text-slate-400 text-sm font-medium">Manage <?= $total_rows ?> products across your stores.</p>
         </div>
 
         <div class="flex flex-wrap gap-3">
+            <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
+                <button onclick="submitBulkDelete()" id="bulkDeleteBtn" style="display:none;"
+                    class="bg-red-500 text-white px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-600 transition-all shadow-sm">
+                    <i class="fas fa-trash mr-2"></i> Delete Selected
+                </button>
+            <?php endif; ?>
             <button onclick="bulkEditPrices()"
                 class="bg-white border border-slate-200 px-6 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-50 transition-all shadow-sm">
                 <i class="fas fa-tags mr-2"></i> Bulk Price Adjust
             </button>
-            <button onclick="openActionModal('add')"
-                class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-cyan-600 transition-all shadow-xl shadow-slate-200">
+            <a href="add-product.php"
+                class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-orange-600 transition-all shadow-xl shadow-slate-200 flex items-center">
                 + Add New Unit
-            </button>
+            </a>
         </div>
     </div>
 
-    <!-- Filters & Search -->
+    <!-- Filters & Search (Keep as is) -->
     <div
         class="bg-white p-8 rounded-[3rem] border border-slate-100 shadow-sm mb-10 flex flex-col lg:flex-row justify-between items-center gap-6">
+        <!-- ... (Keep Search Form) ... -->
         <form method="GET" class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
             <div class="relative w-full md:w-72">
                 <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-slate-300"></i>
                 <input type="text" name="search" value="<?= htmlspecialchars($search) ?>"
                     placeholder="Search SKU or Name..."
-                    class="w-full bg-slate-50 pl-14 pr-6 py-4 rounded-2xl text-xs font-bold outline-none border-2 border-transparent focus:border-cyan-500 transition-all">
+                    class="w-full bg-slate-50 pl-14 pr-6 py-4 rounded-2xl text-xs font-bold outline-none border-2 border-transparent focus:border-orange-500 transition-all">
             </div>
             <select name="category" onchange="this.form.submit()"
-                class="bg-slate-50 px-6 py-4 rounded-2xl text-xs font-bold outline-none border-2 border-transparent focus:border-cyan-500 transition-all">
+                class="bg-slate-50 px-6 py-4 rounded-2xl text-xs font-bold outline-none border-2 border-transparent focus:border-orange-500 transition-all">
                 <option value="">All Categories</option>
                 <?php foreach ($categories as $cat): ?>
                     <option value="<?= $cat['category_id'] ?>" <?= ($cat_id == $cat['category_id']) ? 'selected' : '' ?>>
@@ -124,74 +131,116 @@ $suppliers = $pdo->query("SELECT supplier_id, name FROM suppliers WHERE status =
     </div>
 
     <div class="bg-white rounded-[3rem] border border-slate-100 shadow-sm overflow-hidden overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-            <thead class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                <tr>
-                    <th class="px-8 py-6">Product</th>
-                    <th class="px-6 py-6">Category</th>
-                    <th class="px-6 py-6 text-center">Stock</th>
-                    <th class="px-6 py-6 text-right">Base Price</th>
-                    <th class="px-8 py-6 text-center">Actions</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-50">
-                <?php foreach ($products as $p): ?>
-                    <tr class="hover:bg-slate-50 transition-all group">
-                        <td class="px-8 py-5 flex items-center gap-4">
-                            <img src="../../assets/images/products/<?= $p['main_image'] ?: 'default.png' ?>"
-                                class="w-12 h-12 rounded-xl object-cover border border-slate-100">
-                            <div>
-                                <p class="text-sm font-black text-slate-900 italic"><?= htmlspecialchars($p['name']) ?></p>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tight"><?= $p['sku'] ?>
-                                </p>
-                            </div>
-                        </td>
-                        <td class="px-6 py-5">
-                            <span
-                                class="px-3 py-1 bg-slate-100 text-slate-500 rounded-lg text-[9px] font-black uppercase"><?= $p['category_name'] ?: 'N/A' ?></span>
-                        </td>
-                        <td class="px-6 py-5 text-center">
-                            <span
-                                class="text-sm font-black <?= ($p['stock'] <= $p['min_stock_level']) ? 'text-red-500' : 'text-slate-900' ?>">
-                                <?= $p['stock'] ?>
-                            </span>
-                        </td>
-                        <td class="px-6 py-5 text-right font-black text-slate-900">
-                            ₹<?= number_format($p['price'] ?? 0, 2) ?></td>
-                        <td class="px-8 py-5">
-                            <div class="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
-                                <button
-                                    onclick='openVariantModal(<?= htmlspecialchars(json_encode($p), ENT_QUOTES, "UTF-8") ?>)'
-                                    class="w-9 h-9 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white transition-all shadow-sm"
-                                    title="Manage Variants">
-                                    <i class="fas fa-layer-group text-xs"></i>
-                                </button>
-                                <button
-                                    onclick='openActionModal("edit", <?= htmlspecialchars(json_encode($p), ENT_QUOTES, "UTF-8") ?>)'
-                                    class="w-9 h-9 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-900 hover:text-white transition-all">
-                                    <i class="fas fa-pencil text-xs"></i>
-                                </button>
-                                <button onclick="deleteProduct(<?= $p['product_id'] ?>)"
-                                    class="w-9 h-9 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all">
-                                    <i class="fas fa-trash text-xs"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                <?php endforeach; ?>
-                <?php if (empty($products)): ?>
+        <form id="bulkDeleteForm" action="process_product.php" method="POST">
+            <input type="hidden" name="action" value="bulk_delete">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                     <tr>
-                        <td colspan="5" class="px-8 py-20 text-center">
-                            <i class="fas fa-search text-slate-100 text-6xl mb-4"></i>
-                            <p class="text-sm font-black text-slate-300 uppercase tracking-widest">No products found for
-                                this query</p>
-                        </td>
+                        <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
+                            <th class="px-8 py-6 w-10">
+                                <input type="checkbox" id="selectAll" onclick="toggleSelectAll()"
+                                    class="w-4 h-4 rounded text-orange-600 focus:ring-orange-500 cursor-pointer">
+                            </th>
+                        <?php endif; ?>
+                        <th class="px-8 py-6">Product</th>
+                        <th class="px-6 py-6">Category</th>
+                        <th class="px-6 py-6 text-center">Stock</th>
+                        <th class="px-6 py-6 text-right">Base Price</th>
+                        <th class="px-8 py-6 text-center">Actions</th>
                     </tr>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                </thead>
+                <tbody class="divide-y divide-slate-50">
+                    <?php foreach ($products as $p): ?>
+                        <tr class="hover:bg-slate-50 transition-all group">
+                            <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
+                                <td class="px-8 py-5">
+                                    <input type="checkbox" name="delete_ids[]" value="<?= $p['product_id'] ?>"
+                                        onclick="checkSelection()"
+                                        class="row-checkbox w-4 h-4 rounded text-orange-600 focus:ring-orange-500 cursor-pointer">
+                                </td>
+                            <?php endif; ?>
+                            <td class="px-8 py-5 flex items-center gap-4">
+                                <img src="../../assets/images/products/<?= $p['main_image'] ?: 'default.png' ?>"
+                                    class="w-12 h-12 rounded-xl object-cover border border-slate-100">
+                                <div>
+                                    <p class="text-sm font-black text-slate-900 italic"><?= htmlspecialchars($p['name']) ?>
+                                    </p>
+                                    <p class="text-[10px] text-slate-400 font-bold uppercase tracking-tight">
+                                        <?= $p['sku'] ?>
+                                    </p>
+                                </div>
+                            </td>
+                            <td class="px-6 py-5">
+                                <span
+                                    class="px-3 py-1 bg-slate-100 text-slate-500 rounded-lg text-[9px] font-black uppercase"><?= $p['category_name'] ?: 'N/A' ?></span>
+                            </td>
+                            <td class="px-6 py-5 text-center">
+                                <span
+                                    class="text-sm font-black <?= ($p['stock'] <= $p['min_stock_level']) ? 'text-red-500' : 'text-slate-900' ?>">
+                                    <?= $p['stock'] ?>
+                                </span>
+                            </td>
+                            <td class="px-6 py-5 text-right font-black text-slate-900">
+                                ₹<?= number_format($p['price'] ?? 0, 2) ?></td>
+                            <td class="px-8 py-5">
+                                <div class="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-all">
+                                    <button type="button"
+                                        onclick='openVariantModal(<?= htmlspecialchars(json_encode($p), ENT_QUOTES, "UTF-8") ?>)'
+                                        class="w-9 h-9 rounded-lg bg-purple-50 text-purple-600 hover:bg-purple-600 hover:text-white transition-all shadow-sm"
+                                        title="Manage Variants">
+                                        <i class="fas fa-layer-group text-xs"></i>
+                                    </button>
+                                    <a href="add-product.php?id=<?= $p['product_id'] ?>"
+                                        class="w-9 h-9 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-900 hover:text-white transition-all flex items-center justify-center">
+                                        <i class="fas fa-pencil text-xs"></i>
+                                    </a>
+                                    <?php if (($_SESSION['role'] ?? '') === 'admin'): ?>
+                                        <button type="button" onclick="deleteProduct(<?= $p['product_id'] ?>)"
+                                            class="w-9 h-9 rounded-lg bg-red-50 text-red-600 hover:bg-red-600 hover:text-white transition-all">
+                                            <i class="fas fa-trash text-xs"></i>
+                                        </button>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    <?php if (empty($products)): ?>
+                        <tr>
+                            <td colspan="6" class="px-8 py-20 text-center">
+                                <i class="fas fa-search text-slate-100 text-6xl mb-4"></i>
+                                <p class="text-sm font-black text-slate-300 uppercase tracking-widest">No products found for
+                                    this query</p>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </form>
     </div>
 </main>
+
+<script>
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll');
+        const checkboxes = document.querySelectorAll('.row-checkbox');
+        checkboxes.forEach(cb => cb.checked = selectAll.checked);
+        checkSelection();
+    }
+
+    function checkSelection() {
+        const checkboxes = document.querySelectorAll('.row-checkbox:checked');
+        const bulkBtn = document.getElementById('bulkDeleteBtn');
+        if (bulkBtn) {
+            bulkBtn.style.display = checkboxes.length > 0 ? 'block' : 'none'; // changed to block for button
+        }
+    }
+
+    function submitBulkDelete() {
+        if (confirm('Are you sure you want to delete selected products? This action cannot be undone.')) {
+            document.getElementById('bulkDeleteForm').submit();
+        }
+    }
+</script>
 
 <div id="actionModal" class="fixed inset-0 z-[110] hidden items-center justify-center p-4">
     <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeActionModal()"></div>

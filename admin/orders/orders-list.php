@@ -176,6 +176,12 @@ $all_statuses = ['pending', 'confirmed', 'packed', 'shipped', 'delivered', 'canc
                                         class="w-10 h-10 rounded-xl bg-orange-500 text-white flex items-center justify-center hover:bg-orange-600 transition-all shadow-lg shadow-orange-100">
                                         <i class="fas fa-file-invoice text-xs"></i>
                                     </a>
+                                <?php else: ?>
+                                    <a href="../billing/generate-invoice.php?order_id=<?= $o['order_id'] ?>"
+                                        class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center hover:bg-slate-700 transition-all shadow-lg"
+                                        title="Generate Invoice">
+                                        <i class="fas fa-plus text-xs"></i>
+                                    </a>
                                 <?php endif; ?>
                             </div>
                         </td>

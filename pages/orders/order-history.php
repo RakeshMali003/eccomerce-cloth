@@ -175,11 +175,11 @@ function getStatusBadge($status)
                                                 <div class="flex-1 min-w-0">
                                                     <p class="text-xs font-bold text-slate-900 truncate"><?= e($item['name']) ?></p>
                                                     <p class="text-[10px] text-slate-400 font-bold mt-1">Qty:
-                                                        <?= $item['quantity'] ?> × <?= format_price($item['price']) ?>
+                                                        <?= $item['quantity'] ?> × <?= format_price($item['unit_price']) ?>
                                                     </p>
                                                 </div>
                                                 <p class="text-xs font-black text-slate-900">
-                                                    <?= format_price($item['quantity'] * $item['price']) ?>
+                                                    <?= format_price($item['quantity'] * $item['unit_price']) ?>
                                                 </p>
                                             </div>
                                         <?php endforeach; ?>

@@ -11,7 +11,7 @@ $user_id = $_SESSION['user_id'];
 
 // Fetch Cart Items
 $stmt = $pdo->prepare("
-    SELECT c.cart_id, c.quantity, p.product_id, p.name, p.price, p.wholesale_price, p.main_image, p.stock 
+    SELECT c.cart_id, c.quantity, p.product_id, p.name, p.price, p.wholesale_price, p.min_wholesale_qty, p.main_image, p.stock 
     FROM cart c 
     JOIN products p ON c.product_id = p.product_id 
     WHERE c.user_id = ?
@@ -62,6 +62,16 @@ $total_items = 0;
         <div>
             <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight">Your Bag <span
                     class="text-gray-400 font-light">(<?= count($cart_items) ?>)</span></h1>
+            <div class="flex gap-2 mt-2">
+                <a href="?mode=retail"
+                    class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all <?= (!isset($_GET['mode']) || $_GET['mode'] == 'retail') ? 'bg-zinc-900 text-white border-zinc-900' : 'bg-white text-gray-400 border-gray-200 hover:border-zinc-900' ?>">
+                    Retail
+                </a>
+                <a href="?mode=wholesale"
+                    class="px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border transition-all <?= (isset($_GET['mode']) && $_GET['mode'] == 'wholesale') ? 'bg-orange-600 text-white border-orange-600' : 'bg-white text-gray-400 border-gray-200 hover:border-orange-600' ?>">
+                    Wholesale
+                </a>
+            </div>
         </div>
 
         <?php if (count($cart_items) > 0): ?>
@@ -102,11 +112,18 @@ $total_items = 0;
                 </div>
             <?php else: ?>
                 <?php foreach ($cart_items as $item):
-                    $subtotal = $item['price'] * $item['quantity'];
+                    $mode = $_GET['mode'] ?? 'retail';
+                    $is_wholesale_mode = $mode === 'wholesale';
+
+                    $is_wholesale_qualified = $item['quantity'] >= $item['min_wholesale_qty'];
+                    $effective_price = $is_wholesale_qualified ? $item['wholesale_price'] : $item['price'];
+
+                    $subtotal = $effective_price * $item['quantity'];
                     $total_amount += $subtotal;
                     $total_items += $item['quantity'];
                     ?>
-                    <div class="card p-4 md:p-6 relative group">
+                    <div
+                        class="card p-4 md:p-6 relative group <?= ($is_wholesale_mode && !$is_wholesale_qualified) ? 'border-orange-200 bg-orange-50/10' : '' ?>">
                         <div class="flex gap-4 md:gap-6">
                             <div class="w-24 md:w-32 shrink-0 aspect-[3/4] rounded-xl overflow-hidden bg-gray-50 border">
                                 <img src="<?= get_product_image($item['main_image']) ?>" class="w-full h-full object-cover">
@@ -115,9 +132,29 @@ $total_items = 0;
                                 <div class="flex justify-between items-start">
                                     <div>
                                         <h3 class="text-sm md:text-base font-bold truncate pr-6">
-                                            <?= htmlspecialchars($item['name']) ?></h3>
-                                        <p class="text-[9px] font-bold text-gray-400 uppercase mt-1">Price:
-                                            <?= format_price($item['price']) ?></p>
+                                            <?= htmlspecialchars($item['name']) ?>
+                                        </h3>
+                                        <div class="mt-1">
+                                            <?php if ($is_wholesale_qualified): ?>
+                                                <span
+                                                    class="bg-green-100 text-green-700 px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-tight">Wholesale
+                                                    Active</span>
+                                                <p class="text-lg font-bold text-green-600"><?= format_price($effective_price) ?>
+                                                </p>
+                                                <p class="text-[9px] text-gray-400 line-through"><?= format_price($item['price']) ?>
+                                                </p>
+                                            <?php else: ?>
+                                                <p class="text-[9px] font-bold text-gray-400 uppercase">Retail Price</p>
+                                                <p class="text-lg font-bold text-gray-900"><?= format_price($effective_price) ?></p>
+                                                <?php if ($is_wholesale_mode): ?>
+                                                    <p class="text-[9px] text-orange-600 font-bold mt-1">
+                                                        Add <?= $item['min_wholesale_qty'] - $item['quantity'] ?> more for <span
+                                                            class="underline">Wholesale Price
+                                                            (<?= format_price($item['wholesale_price']) ?>)</span>
+                                                    </p>
+                                                <?php endif; ?>
+                                            <?php endif; ?>
+                                        </div>
                                     </div>
                                     <a href="cart-action.php?action=remove&product_id=<?= $item['product_id'] ?>"
                                         class="text-gray-300 hover:text-red-500 transition-colors"

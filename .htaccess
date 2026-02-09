@@ -1,0 +1,23 @@
+# Prevent directory listing
+Options -Indexes
+
+# Follow symlinks
+Options +FollowSymLinks
+
+# Default charset
+AddDefaultCharset UTF-8
+
+# Protect sensitive files
+<FilesMatch "^\.env|config\.php|composer\.json|package\.json">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Basic Rewrite Rules (Optional, for clean URLs if needed later)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    # RewriteBase /
+    
+    # Redirect Trailing Slashes
+    # RewriteRule ^(.*)/$ /$1 [L,R=301]
+</IfModule>

@@ -26,8 +26,15 @@ function verify_csrf_token($token)
 // Image Helper
 function get_product_image($image_path)
 {
+    $base_dir = 'assets/images/products/';
+
+    // If path doesn't start with assets, prepend base dir
+    if (!empty($image_path) && strpos($image_path, 'assets/') === false) {
+        $image_path = $base_dir . $image_path;
+    }
+
     if (!empty($image_path) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/ecommerce-website/' . $image_path)) {
-        return 'http://localhost/ecommerce-website/' . $image_path;
+        return BASE_URL . $image_path;
     }
     return 'https://via.placeholder.com/600x800?text=No+Image';
 }
@@ -74,5 +81,27 @@ function has_permission($permission)
     }
 
     return in_array($permission, $_SESSION['permissions']);
+}
+
+// Cart Count Helper
+function get_cart_count()
+{
+    global $pdo;
+    if (!isset($_SESSION['user_id']))
+        return 0;
+    $stmt = $pdo->prepare("SELECT SUM(quantity) FROM cart WHERE user_id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    return (int) $stmt->fetchColumn();
+}
+
+// Wishlist Count Helper
+function get_wishlist_count()
+{
+    global $pdo;
+    if (!isset($_SESSION['user_id']))
+        return 0;
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM wishlist WHERE user_id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    return (int) $stmt->fetchColumn();
 }
 ?>

@@ -14,9 +14,9 @@ if (!isset($_SESSION['admin_id'])) {
 ---------------------------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'add') {
 
-    $name   = trim($_POST['name']);
-    $email  = trim($_POST['email']);
-    $phone  = trim($_POST['phone']);
+    $name = trim($_POST['name']);
+    $email = trim($_POST['email']);
+    $phone = trim($_POST['phone']);
     $status = $_POST['status'] ?? 'active';
 
     $password = password_hash('User@123', PASSWORD_BCRYPT);
@@ -43,11 +43,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 ---------------------------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'edit') {
 
-    $user_id = (int)$_POST['user_id'];
-    $name    = trim($_POST['name']);
-    $email   = trim($_POST['email']);
-    $phone   = trim($_POST['phone']);
-    $status  = $_POST['status'] ?? 'active';
+    $user_id = (int) $_POST['user_id'];
+    $name = trim($_POST['name']);
+    $email = trim($_POST['email']);
+    $phone = trim($_POST['phone']);
+    $status = $_POST['status'] ?? 'active';
 
     try {
         $stmt = $pdo->prepare(
@@ -70,9 +70,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 /* ----------------------------
    DELETE USER
 ---------------------------- */
+/* ----------------------------
+   DELETE USER
+---------------------------- */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
 
-    $delete_id = (int)$_POST['delete_id'];
+    // Helper to check permission
+    if (($_SESSION['role'] ?? '') !== 'admin') {
+        die("Unauthorized Action");
+    }
+
+    $delete_id = (int) $_POST['delete_id'];
 
     try {
         $stmt = $pdo->prepare(
@@ -89,6 +97,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
 
     } catch (PDOException $e) {
         header("Location: users.php?msg=error&error=" . urlencode($e->getMessage()));
+        exit();
+    }
+}
+
+/* ----------------------------
+   BULK DELETE
+---------------------------- */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'bulk_delete') {
+
+    if (($_SESSION['role'] ?? '') !== 'admin') {
+        die("Unauthorized Action");
+    }
+
+    $ids = $_POST['delete_ids'] ?? [];
+
+    if (!empty($ids)) {
+        try {
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $stmt = $pdo->prepare("DELETE FROM users WHERE user_id IN ($placeholders) AND role = 'user'");
+            $stmt->execute($ids);
+
+            header("Location: users.php?msg=deleted");
+            exit();
+        } catch (PDOException $e) {
+            header("Location: users.php?msg=error&error=" . urlencode($e->getMessage()));
+            exit();
+        }
+    } else {
+        header("Location: users.php");
         exit();
     }
 }
@@ -128,7 +165,7 @@ if (isset($_GET['msg'])) {
 
 <!-- ALERT REPEAT FIX -->
 <script>
-if (window.location.search.includes('msg=')) {
-    window.history.replaceState({}, document.title, window.location.pathname);
-}
+    if (window.location.search.includes('msg=')) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
 </script>

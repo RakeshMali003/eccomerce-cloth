@@ -1,6 +1,8 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 require_once '../../config/database.php';
-include '../../includes/header.php';
 
 $is_logged_in = isset($_SESSION['user_id']);
 $user_id = $is_logged_in ? $_SESSION['user_id'] : null;
@@ -39,6 +41,8 @@ if (isset($_GET['action'])) {
     header("Location: wishlist.php");
     exit();
 }
+
+include '../../includes/header.php';
 
 // Fetch wishlist items from database
 $wishlist = [];
@@ -162,7 +166,8 @@ if ($is_logged_in) {
                     </div>
                     <div class="p-6">
                         <p class="text-[9px] font-black text-slate-300 uppercase tracking-widest">
-                            <?= e($item['category_name'] ?? 'Collection') ?></p>
+                            <?= e($item['category_name'] ?? 'Collection') ?>
+                        </p>
                         <h3 class="font-bold text-slate-900 truncate mt-1"><?= e($item['name']) ?></h3>
                         <div class="flex justify-between items-center mt-4 pt-4 border-t border-slate-50">
                             <div>

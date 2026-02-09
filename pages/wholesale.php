@@ -1,8 +1,10 @@
-<?php include '../includes/header.php'; ?>
+<?php include '../includes/header.php';
+require_once '../includes/cms_helper.php';
+?>
 
 <header class="relative bg-zinc-900 text-white pt-32 pb-20 px-6 overflow-hidden">
     <div class="absolute inset-0 opacity-20">
-        <img src="https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2069&auto=format&fit=crop"
+        <img src="<?= get_cms_content('wholesale', 'hero_image', 'https://images.unsplash.com/photo-1621905251189-08b45d6a269e?q=80&w=2069&auto=format&fit=crop') ?>"
             class="w-full h-full object-cover">
     </div>
     <div class="container mx-auto relative z-10 text-center">
@@ -17,10 +19,12 @@
                 class="bg-white/10 backdrop-blur-md px-4 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border border-white/20">Genuine
                 Products</span>
         </div>
-        <h1 class="text-4xl md:text-7xl font-sans font-bold mb-6 leading-tight">Electrical Wholesale Supplier<br><span
-                class="text-yellow-500">Bulk Orders at Best Rates</span></h1>
-        <p class="text-zinc-400 max-w-2xl mx-auto text-lg mb-10">Premium quality HPL, Anchor, Havells products for
-            retailers, electricians & contractors. Pan-India delivery.</p>
+        <h1 class="text-4xl md:text-7xl font-sans font-bold mb-6 leading-tight">
+            <?= get_cms_content('wholesale', 'hero_title', 'Electrical Wholesale Supplier<br><span class="text-yellow-500">Bulk Orders at Best Rates</span>') ?>
+        </h1>
+        <p class="text-zinc-400 max-w-2xl mx-auto text-lg mb-10">
+            <?= get_cms_content('wholesale', 'hero_desc', 'Premium quality HPL, Anchor, Havells products for retailers, electricians & contractors. Pan-India delivery.') ?>
+        </p>
 
         <div class="flex flex-wrap justify-center gap-4">
             <a href="#catalogue"

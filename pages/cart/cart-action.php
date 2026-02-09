@@ -101,7 +101,10 @@ if ($action === 'clear') {
 }
 
 // Redirect back
-$redirect = $_SERVER['HTTP_REFERER'] ?? 'cart.php';
+$redirect = $_REQUEST['redirect'] ?? $_SERVER['HTTP_REFERER'] ?? 'cart.php';
+if ($redirect === 'checkout') {
+    $redirect = 'checkout.php';
+}
 header("Location: $redirect");
 exit();
 ?>

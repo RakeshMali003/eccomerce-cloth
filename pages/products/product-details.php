@@ -16,7 +16,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review']) && $
         $stmt = $pdo->prepare("INSERT INTO product_reviews (product_id, user_id, rating, review_text) VALUES (?, ?, ?, ?)");
         $stmt->execute([$product_id, $user_id, $rating, $review_text]);
         $success_msg = "Review submitted successfully!";
-        // Redirect to avoid resubmission
         echo "<script>window.location.href='product-details.php?id=$product_id';</script>";
         exit;
     } else {
@@ -37,7 +36,7 @@ if (!$product) {
 
 // Fetch Reviews
 $stmt_reviews = $pdo->prepare("
-    SELECT r.*, u.full_name 
+    SELECT r.*, u.name as full_name 
     FROM product_reviews r 
     JOIN users u ON r.user_id = u.user_id 
     WHERE r.product_id = ? 
@@ -55,6 +54,14 @@ if ($review_count > 0) {
         $sum += $r['rating'];
     $avg_rating = round($sum / $review_count, 1);
 }
+
+// Check Wishlist Status
+$in_wishlist = false;
+if ($user_id) {
+    $stmt_w = $pdo->prepare("SELECT 1 FROM wishlist WHERE user_id = ? AND product_id = ?");
+    $stmt_w->execute([$user_id, $product_id]);
+    $in_wishlist = $stmt_w->fetchColumn();
+}
 ?>
 
 <div class="bg-[#FBFBFB] py-12">
@@ -70,9 +77,26 @@ if ($review_count > 0) {
         <div class="flex flex-col lg:flex-row gap-12">
             <!-- Image Gallery -->
             <div class="w-full lg:w-1/2">
-                <div
-                    class="aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-white shadow-xl shadow-zinc-200/50 mb-6 sticky top-28">
-                    <img src="<?= get_product_image($product['main_image']) ?>" class="w-full h-full object-cover">
+                <div class="sticky top-28 space-y-4">
+                    <div class="aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-white shadow-xl shadow-zinc-200/50 relative">
+                        <img id="mainImage" src="<?= get_product_image($product['main_image']) ?>" class="w-full h-full object-contain p-4">
+                        <button type="button" id="wishlist-btn" onclick="toggleWishlist(<?= $product_id ?>)"
+                            class="absolute top-6 right-6 w-12 h-12 bg-white/80 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white transition-all group shadow-lg z-10">
+                            <i class="<?= $in_wishlist ? 'fas text-red-500' : 'far' ?> fa-heart text-xl group-hover:text-red-500 transition-colors"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="grid grid-cols-5 gap-2">
+                        <div onclick="changeImage('<?= get_product_image($product['main_image']) ?>')" class="cursor-pointer border-2 border-orange-500 rounded-xl overflow-hidden aspect-square">
+                            <img src="<?= get_product_image($product['main_image']) ?>" class="w-full h-full object-cover">
+                        </div>
+                        <?php for($i=1; $i<=4; $i++): 
+                            if(!empty($product['image_'.$i])): ?>
+                            <div onclick="changeImage('<?= get_product_image($product['image_'.$i]) ?>')" class="cursor-pointer border border-zinc-200 hover:border-orange-500 rounded-xl overflow-hidden aspect-square opacity-70 hover:opacity-100 transition-all">
+                                <img src="<?= get_product_image($product['image_'.$i]) ?>" class="w-full h-full object-cover">
+                            </div>
+                        <?php endif; endfor; ?>
+                    </div>
                 </div>
             </div>
 
@@ -93,11 +117,17 @@ if ($review_count > 0) {
                     </div>
 
                     <div class="flex items-baseline gap-4">
-                        <span
-                            class="text-3xl font-black text-orange-600 tracking-tight"><?= format_price($product['price']) ?></span>
+                        <span id="price-display" class="text-3xl font-black text-orange-600 tracking-tight" 
+                              data-base-price="<?= $product['price'] ?>"
+                              data-wholesale-price="<?= $product['wholesale_price'] ?? 0 ?>"
+                              data-min-wholesale="<?= $product['min_wholesale_qty'] ?? 1 ?>">
+                            <?= format_price($product['price']) ?>
+                        </span>
                         <?php if (($product['wholesale_price'] ?? 0) > 0): ?>
-                            <span class="text-sm font-bold text-zinc-400 uppercase tracking-widest">Wholesale:
-                                <?= format_price($product['wholesale_price']) ?></span>
+                            <span class="text-sm font-bold text-zinc-400 uppercase tracking-widest">
+                                Wholesale: <?= format_price($product['wholesale_price']) ?> 
+                                (Min <?= $product['min_wholesale_qty'] ?> Qty)
+                            </span>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -114,33 +144,31 @@ if ($review_count > 0) {
                         <input type="hidden" name="action" value="add">
                         <input type="hidden" name="product_id" value="<?= $product_id ?>">
 
-                        <div class="w-20">
-                            <input type="number" name="quantity" value="1" min="1" max="<?= $product['stock'] ?>"
-                                class="w-full h-full text-center font-bold border-zinc-200 rounded-xl focus:ring-orange-500 focus:border-orange-500">
+                        <div class="w-24">
+                            <label class="sr-only">Quantity</label>
+                            <input type="number" name="quantity" id="qty-input" value="1" min="1" max="<?= $product['stock'] ?>"
+                                onchange="updatePrice()" onkeyup="updatePrice()"
+                                class="w-full h-full text-center font-bold border-zinc-200 rounded-xl focus:ring-orange-500 focus:border-orange-500 text-lg">
                         </div>
 
-                        <button type="submit"
+                        <button type="submit" name="redirect" value="cart.php"
                             class="flex-1 bg-zinc-900 text-white py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg hover:shadow-orange-600/30">
                             Add to Cart
                         </button>
 
-                        <button type="button"
-                            class="w-16 bg-white text-zinc-900 border border-zinc-200 py-4 rounded-xl flex items-center justify-center hover:bg-zinc-50 transition-all">
-                            <i class="far fa-heart"></i>
+                        <button type="submit" name="redirect" value="checkout"
+                            class="flex-1 bg-orange-600 text-white py-4 rounded-xl font-bold uppercase tracking-widest hover:bg-orange-700 transition-all shadow-lg shadow-orange-200">
+                            Buy Now
                         </button>
                     </form>
 
-                    <?php if (($product['min_wholesale_qty'] ?? 0) > 1): ?>
-                        <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 flex items-start gap-3">
-                            <i class="fas fa-info-circle text-orange-600 mt-1"></i>
-                            <div>
-                                <p class="text-xs font-bold text-orange-800 uppercase tracking-wide mb-1">Wholesale
-                                    Information</p>
-                                <p class="text-xs text-orange-700">Minimum order quantity for wholesale pricing is
-                                    <?= $product['min_wholesale_qty'] ?> units.</p>
-                            </div>
+                    <div id="wholesale-alert" class="hidden bg-orange-50 p-4 rounded-xl border border-orange-100 flex items-start gap-3 animation-fade-in">
+                        <i class="fas fa-check-circle text-orange-600 mt-1"></i>
+                        <div>
+                            <p class="text-xs font-bold text-orange-800 uppercase tracking-wide mb-1">Wholesale Pricing Applied!</p>
+                            <p class="text-xs text-orange-700">You are saving big with our bulk discount rates.</p>
                         </div>
-                    <?php endif; ?>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 text-xs font-bold text-zinc-500 pt-8">
@@ -227,7 +255,123 @@ if ($review_count > 0) {
 
             </div>
         </div>
+
+        <!-- Similar Products -->
+        <div class="mt-20 border-t border-zinc-200 pt-16">
+            <h3 class="text-3xl font-black text-zinc-900 mb-10">Similar Products</h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <?php
+                $stmt_sim = $pdo->prepare("SELECT * FROM products WHERE category_id = ? AND product_id != ? AND status = 1 LIMIT 4");
+                $stmt_sim->execute([$product['category_id'], $product_id]);
+                $similar = $stmt_sim->fetchAll();
+                
+                if($similar):
+                    foreach($similar as $sim):
+                ?>
+                <a href="product-details.php?id=<?= $sim['product_id'] ?>" class="group">
+                    <div class="aspect-[3/4] bg-white rounded-2xl overflow-hidden mb-4 border border-zinc-100 relative">
+                        <img src="<?= get_product_image($sim['main_image']) ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    </div>
+                    <h4 class="font-bold text-zinc-900 truncate"><?= htmlspecialchars($sim['name']) ?></h4>
+                    <p class="text-orange-600 font-bold mt-1"><?= format_price($sim['price']) ?></p>
+                </a>
+                <?php endforeach; else: ?>
+                    <p class="text-zinc-400">No similar products found.</p>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+    function updatePrice() {
+        const qtyInput = document.getElementById('qty-input');
+        const priceDisplay = document.getElementById('price-display');
+        const alertBox = document.getElementById('wholesale-alert');
+        
+        const qty = parseInt(qtyInput.value) || 1;
+        const basePrice = parseFloat(priceDisplay.getAttribute('data-base-price'));
+        const wholesalePrice = parseFloat(priceDisplay.getAttribute('data-wholesale-price'));
+        const minWholesaleQty = parseInt(priceDisplay.getAttribute('data-min-wholesale'));
+
+        let finalPrice = basePrice;
+        let isWholesale = false;
+
+        if (wholesalePrice > 0 && qty >= minWholesaleQty) {
+            finalPrice = wholesalePrice;
+            isWholesale = true;
+        }
+
+        // Format as Indian Rupee
+        const formatter = new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR'
+        });
+
+        priceDisplay.innerText = formatter.format(finalPrice); // Show unit price
+        
+        if(isWholesale) {
+            alertBox.classList.remove('hidden');
+            priceDisplay.classList.add('text-green-600');
+            priceDisplay.classList.remove('text-orange-600');
+        } else {
+            alertBox.classList.add('hidden');
+            priceDisplay.classList.remove('text-green-600');
+            priceDisplay.classList.add('text-orange-600');
+        }
+    }
+
+    function toggleWishlist(productId) {
+        const btn = document.getElementById('wishlist-btn');
+        const icon = btn.querySelector('i');
+        
+        // Optimistic UI update
+        const wasActive = icon.classList.contains('fas');
+        if (wasActive) {
+             icon.classList.remove('fas', 'text-red-500');
+             icon.classList.add('far');
+        } else {
+             icon.classList.remove('far');
+             icon.classList.add('fas', 'text-red-500');
+        }
+
+        fetch('../../pages/cart/wishlist-action.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'action=toggle&product_id=' + productId
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.status === 'error') {
+                // Revert if error
+                 if (wasActive) {
+                     icon.classList.remove('far');
+                     icon.classList.add('fas', 'text-red-500');
+                } else {
+                     icon.classList.remove('fas', 'text-red-500');
+                     icon.classList.add('far');
+                }
+                
+                alert(data.message);
+                if(data.message.includes('login')) {
+                    window.location.href = '../../pages/auth/login.php';
+                }
+            }
+        })
+        .catch(err => {
+             console.error(err);
+             // Revert logic on network error could go here
+        });
+    }
+
+    function changeImage(src) {
+        document.getElementById('mainImage').src = src;
+    }
+
+    // Initialize
+    updatePrice();
+</script>
 
 <?php include '../../includes/footer.php'; ?>

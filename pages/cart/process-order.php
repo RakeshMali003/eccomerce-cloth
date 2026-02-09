@@ -54,7 +54,7 @@ try {
         $user_id = $_SESSION['user_id'];
     } else {
         // Create a guest user account if not logged in
-        $dummy_email = "guest_" . time() . "@gurukrupa.com";
+        $dummy_email = "guest_" . time() . "@joshielectricals.com";
         $dummy_pass = password_hash(bin2hex(random_bytes(8)), PASSWORD_BCRYPT);
 
         $user_stmt = $pdo->prepare("INSERT INTO users (name, email, phone, password, role, status, created_at) VALUES (?, ?, ?, ?, 'user', 'active', NOW())");

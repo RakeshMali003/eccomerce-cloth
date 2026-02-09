@@ -19,6 +19,12 @@ if ($category_filter_id) {
     $sql .= " AND p.category_id = :cat_id";
 }
 
+// Search Filter
+$search_query = isset($_GET['search']) ? trim($_GET['search']) : null;
+if ($search_query) {
+    $sql .= " AND (p.name LIKE :search1 OR p.description LIKE :search2 OR p.sku LIKE :search3)";
+}
+
 // Sorting logic
 $sort_option = $_GET['sort'] ?? 'newest';
 switch ($sort_option) {
@@ -39,6 +45,11 @@ switch ($sort_option) {
 $stmt = $pdo->prepare($sql);
 if ($category_filter_id) {
     $stmt->bindValue(':cat_id', $category_filter_id, PDO::PARAM_INT);
+}
+if ($search_query) {
+    $stmt->bindValue(':search1', "%$search_query%", PDO::PARAM_STR);
+    $stmt->bindValue(':search2', "%$search_query%", PDO::PARAM_STR);
+    $stmt->bindValue(':search3', "%$search_query%", PDO::PARAM_STR);
 }
 $stmt->execute();
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);

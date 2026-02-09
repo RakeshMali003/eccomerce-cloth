@@ -6,13 +6,45 @@ $action = $_REQUEST['action'] ?? '';
 
 // --- DELETE LOGIC ---
 if ($action === 'delete' && isset($_GET['id'])) {
+
+    // Check permission
+    if (($_SESSION['role'] ?? '') !== 'admin') {
+        $_SESSION['toast'] = ['msg' => 'Unauthorized Access', 'type' => 'error'];
+        header("Location: products-list.php");
+        exit();
+    }
+
     try {
         // Check if product is linked to any purchase items before deleting
+        // ... (optional check)
         $stmt = $pdo->prepare("DELETE FROM products WHERE product_id = ?");
         $stmt->execute([$_GET['id']]);
         $_SESSION['toast'] = ['msg' => 'Product removed!', 'type' => 'success'];
     } catch (Exception $e) {
         $_SESSION['toast'] = ['msg' => 'Cannot delete: Product is linked to transactions.', 'type' => 'error'];
+    }
+    header("Location: products-list.php");
+    exit();
+}
+
+// --- BULK DELETE LOGIC ---
+if ($action === 'bulk_delete') {
+    if (($_SESSION['role'] ?? '') !== 'admin') {
+        $_SESSION['toast'] = ['msg' => 'Unauthorized Action', 'type' => 'error'];
+        header("Location: products-list.php");
+        exit();
+    }
+
+    $ids = $_POST['delete_ids'] ?? [];
+    if (!empty($ids)) {
+        try {
+            $placeholders = implode(',', array_fill(0, count($ids), '?'));
+            $stmt = $pdo->prepare("DELETE FROM products WHERE product_id IN ($placeholders)");
+            $stmt->execute($ids);
+            $_SESSION['toast'] = ['msg' => 'Selected products deleted successfully!', 'type' => 'success'];
+        } catch (Exception $e) {
+            $_SESSION['toast'] = ['msg' => 'Error deleting items: ' . $e->getMessage(), 'type' => 'error'];
+        }
     }
     header("Location: products-list.php");
     exit();

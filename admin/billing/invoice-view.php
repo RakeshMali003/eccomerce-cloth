@@ -18,7 +18,8 @@ $stmt = $pdo->prepare($query);
 $stmt->execute([$invoice_id]);
 $inv = $stmt->fetch();
 
-if (!$inv) die("Invoice not found.");
+if (!$inv)
+    die("Invoice not found.");
 
 // 2. Fetch Order Items
 $item_query = "SELECT oi.*, p.name as product_name, pv.size, pv.color 
@@ -33,6 +34,7 @@ $items = $stmt_items->fetchAll();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Invoice - <?= $inv['invoice_number'] ?></title>
@@ -40,29 +42,43 @@ $items = $stmt_items->fetchAll();
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         @media print {
-            .no-print { display: none; }
-            body { background: white; }
-            .print-shadow-none { shadow: none; border: none; }
+            .no-print {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+
+            .print-shadow-none {
+                shadow: none;
+                border: none;
+            }
         }
     </style>
 </head>
+
 <body class="bg-slate-50 p-4 md:p-10">
 
     <div class="max-w-4xl mx-auto mb-6 flex justify-between items-center no-print">
         <a href="order-list.php" class="text-slate-500 font-bold text-sm hover:text-slate-900">
             <i class="fas fa-arrow-left mr-2"></i> Back to Orders
         </a>
-        <button onclick="window.print()" class="bg-slate-900 text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg">
+        <button onclick="window.print()"
+            class="bg-slate-900 text-white px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:bg-orange-600 transition-all shadow-lg">
             <i class="fas fa-print mr-2"></i> Print Invoice
         </button>
     </div>
 
-    <div class="max-w-4xl mx-auto bg-white rounded-[2.5rem] shadow-xl overflow-hidden print-shadow-none border border-slate-100">
-        
+    <div
+        class="max-w-4xl mx-auto bg-white rounded-[2.5rem] shadow-xl overflow-hidden print-shadow-none border border-slate-100">
+
         <div class="p-10 bg-slate-900 text-white flex justify-between items-start">
             <div>
-                <h1 class="text-3xl font-black tracking-tighter">GURUKRUPA<span class="text-orange-500">.</span></h1>
-                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">Premium Clothing Store</p>
+                <h1 class="text-3xl font-black tracking-tighter">JOSHI ELECTRICALS<span class="text-orange-500">.</span>
+                </h1>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-1">Premium Clothing Store
+                </p>
             </div>
             <div class="text-right">
                 <h2 class="text-xl font-black uppercase italic opacity-50">Tax Invoice</h2>
@@ -85,7 +101,8 @@ $items = $stmt_items->fetchAll();
                 <div class="text-right">
                     <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Shipment Detail:</p>
                     <p class="text-sm text-slate-500">
-                        <span class="font-bold text-slate-900">Payment:</span> <?= strtoupper($inv['payment_method']) ?><br>
+                        <span class="font-bold text-slate-900">Payment:</span>
+                        <?= strtoupper($inv['payment_method']) ?><br>
                         <span class="font-bold text-slate-900">Order Type:</span> <?= ucfirst($inv['order_type']) ?><br>
                     </p>
                 </div>
@@ -93,7 +110,8 @@ $items = $stmt_items->fetchAll();
 
             <table class="w-full mb-10">
                 <thead>
-                    <tr class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
+                    <tr
+                        class="text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
                         <th class="py-4 text-left">Description</th>
                         <th class="py-4 text-center">Qty</th>
                         <th class="py-4 text-right">Price</th>
@@ -103,18 +121,21 @@ $items = $stmt_items->fetchAll();
                 </thead>
                 <tbody class="divide-y divide-slate-50">
                     <?php foreach ($items as $item): ?>
-                    <tr>
-                        <td class="py-5">
-                            <p class="text-sm font-black text-slate-900"><?= $item['product_name'] ?></p>
-                            <?php if($item['size'] || $item['color']): ?>
-                            <p class="text-[10px] text-slate-400 font-bold uppercase">Size: <?= $item['size'] ?> | Color: <?= $item['color'] ?></p>
-                            <?php endif; ?>
-                        </td>
-                        <td class="py-5 text-center text-sm font-bold text-slate-600"><?= $item['quantity'] ?></td>
-                        <td class="py-5 text-right text-sm font-bold text-slate-600">₹<?= number_format($item['unit_price'], 2) ?></td>
-                        <td class="py-5 text-right text-sm font-bold text-slate-600"><?= $item['gst_percent'] ?>%</td>
-                        <td class="py-5 text-right text-sm font-black text-slate-900">₹<?= number_format($item['total_price'], 2) ?></td>
-                    </tr>
+                        <tr>
+                            <td class="py-5">
+                                <p class="text-sm font-black text-slate-900"><?= $item['product_name'] ?></p>
+                                <?php if ($item['size'] || $item['color']): ?>
+                                    <p class="text-[10px] text-slate-400 font-bold uppercase">Size: <?= $item['size'] ?> |
+                                        Color: <?= $item['color'] ?></p>
+                                <?php endif; ?>
+                            </td>
+                            <td class="py-5 text-center text-sm font-bold text-slate-600"><?= $item['quantity'] ?></td>
+                            <td class="py-5 text-right text-sm font-bold text-slate-600">
+                                ₹<?= number_format($item['unit_price'], 2) ?></td>
+                            <td class="py-5 text-right text-sm font-bold text-slate-600"><?= $item['gst_percent'] ?>%</td>
+                            <td class="py-5 text-right text-sm font-black text-slate-900">
+                                ₹<?= number_format($item['total_price'], 2) ?></td>
+                        </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
@@ -131,17 +152,21 @@ $items = $stmt_items->fetchAll();
                     </div>
                     <div class="flex justify-between items-center pt-3 border-t border-slate-100">
                         <span class="text-slate-900 font-black uppercase text-xs">Grand Total</span>
-                        <span class="text-2xl font-black text-slate-900">₹<?= number_format($inv['total_amount'], 2) ?></span>
+                        <span
+                            class="text-2xl font-black text-slate-900">₹<?= number_format($inv['total_amount'], 2) ?></span>
                     </div>
                 </div>
             </div>
 
             <div class="mt-20 pt-10 border-t border-slate-100 text-center">
-                <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Thank you for shopping at Gurukrupa</p>
-                <p class="text-[9px] text-slate-400 mt-2 italic">This is a computer generated invoice and does not require a physical signature.</p>
+                <p class="text-[10px] font-black text-slate-300 uppercase tracking-[0.3em]">Thank you for shopping at
+                    Joshi Electricals</p>
+                <p class="text-[9px] text-slate-400 mt-2 italic">This is a computer generated invoice and does not
+                    require a physical signature.</p>
             </div>
         </div>
     </div>
 
 </body>
+
 </html>

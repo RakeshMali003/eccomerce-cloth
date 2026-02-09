@@ -15,7 +15,7 @@ $order_id = $_GET['id'] ?? 0;
             </div>
 
             <h1 class="text-4xl font-black tracking-tight text-slate-900 mb-4">Order Placed Successfully!</h1>
-            <p class="text-slate-500 text-lg mb-10">Thank you for shopping with Gurukrupa. Your order <span
+            <p class="text-slate-500 text-lg mb-10">Thank you for shopping with Joshi Electricals. Your order <span
                     class="font-bold text-slate-900">#ORD-
                     <?php echo $order_id; ?>
                 </span> is now being processed.</p>

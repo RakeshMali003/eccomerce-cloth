@@ -1,14 +1,14 @@
 <?php
 $current_page = basename($_SERVER['PHP_SELF']);
-$base_url = 'http://localhost/ecommerce-website/admin/';
+$base_url = BASE_URL . 'admin/';
 ?>
 <aside
     class="w-72 bg-white h-screen fixed left-0 top-0 border-r border-slate-100 flex-col z-[100] sidebar-scroll overflow-y-auto font-sans hidden lg:flex">
     <div class="p-8 mb-4">
         <h1 class="text-2xl font-black tracking-tighter text-slate-900 flex items-center gap-2">
-            <div class="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center text-white text-sm italic">T
+            <div class="w-8 h-8 bg-orange-600 rounded-lg flex items-center justify-center text-white text-sm italic">J
             </div>
-            Thread & Trend<span class="text-orange-600">.</span>
+            Joshi Electricals<span class="text-orange-600">.</span>
         </h1>
     </div>
 
@@ -144,6 +144,21 @@ $base_url = 'http://localhost/ecommerce-website/admin/';
                             <i class="fas fa-cogs"></i> System Config
                         </a>
                     <?php endif; ?>
+
+                    <!-- New Inquiry & Dealer Links -->
+                    <a href="<?= $base_url; ?>inquiries/inquiry-list.php"
+                        class="flex items-center gap-4 px-6 py-4 rounded-2xl text-sm font-bold <?= ($current_page == 'inquiry-list.php') ? 'bg-slate-900 text-white shadow-xl shadow-slate-200' : 'text-slate-500 hover:bg-slate-50' ?> transition-all">
+                        <i class="fas fa-envelope-open-text"></i> Inquiries
+                    </a>
+                    <a href="<?= $base_url; ?>dealers/applications.php"
+                        class="flex items-center gap-4 px-6 py-4 rounded-2xl text-sm font-bold <?= ($current_page == 'applications.php') ? 'bg-slate-900 text-white shadow-xl shadow-slate-200' : 'text-slate-500 hover:bg-slate-50' ?> transition-all">
+                        <i class="fas fa-handshake"></i> Dealer Apps
+                    </a>
+                    <a href="<?= $base_url; ?>settings/pages.php"
+                        class="flex items-center gap-4 px-6 py-4 rounded-2xl text-sm font-bold <?= ($current_page == 'pages.php') ? 'bg-slate-900 text-white shadow-xl shadow-slate-200' : 'text-slate-500 hover:bg-slate-50' ?> transition-all">
+                        <i class="fas fa-pen-nib"></i> Page Content
+                    </a>
+
                 </div>
             </div>
         <?php endif; ?>

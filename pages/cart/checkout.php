@@ -300,7 +300,7 @@ $grand_total = $subtotal + $gst;
                 finalTotal -= (baseSubtotal * 0.01);
                 detailsBox.innerHTML = `
                 <div class="fade-in">
-                    <p class="text-xs font-bold text-slate-800 mb-2">Gurukrupa Bank Details</p>
+                    <p class="text-xs font-bold text-slate-800 mb-2">Joshi Electricals Bank Details</p>
                     <p class="text-[11px] text-slate-500 leading-relaxed font-medium">HDFC Bank, Surat Main Branch<br>A/C: 502000XXXXXXX<br>IFSC: HDFC0000123</p>
                     <p class="text-[9px] text-orange-600 font-bold mt-3 uppercase tracking-tighter">*Order processed after verify</p>
                 </div>`;

@@ -14,7 +14,7 @@ if (!isset($_SESSION['admin_id'])) {
     }
 }
 
-$base_url = "http://localhost/ecommerce-website/admin/";
+$base_url = BASE_URL . 'admin/';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -22,7 +22,7 @@ $base_url = "http://localhost/ecommerce-website/admin/";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gurukrupa Admin | Command Center</title>
+    <title>Joshi Electricals Admin | Command Center</title>
 
     <!-- CSS Dependencies -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -78,4 +78,47 @@ $base_url = "http://localhost/ecommerce-website/admin/";
 
         <!-- Main Content Wrapper -->
         <div class="flex-1 ml-0 lg:ml-72 transition-all duration-300">
-            <!-- Top bar / Global Navigation branding could go here -->
+            <!-- Top Navigation Bar -->
+            <div
+                class="glass-header sticky top-0 z-40 px-8 py-4 flex justify-between items-center bg-white/80 backdrop-blur-md border-b border-slate-200">
+                <button class="lg:hidden text-slate-500 hover:text-slate-900 transition-colors">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+
+                <div class="flex items-center gap-6 ml-auto">
+                    <div class="relative group">
+                        <button class="flex items-center gap-3 hover:bg-slate-50 py-2 px-4 rounded-xl transition-all">
+                            <div
+                                class="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-sm">
+                                <?= strtoupper(substr($_SESSION['admin_name'] ?? 'A', 0, 1)) ?>
+                            </div>
+                            <div class="text-left hidden md:block">
+                                <p class="text-sm font-black text-slate-800 leading-tight">
+                                    <?= htmlspecialchars($_SESSION['admin_name'] ?? 'Admin') ?>
+                                </p>
+                                <p class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Administrator
+                                </p>
+                            </div>
+                            <i class="fas fa-chevron-down text-slate-300 text-xs"></i>
+                        </button>
+
+                        <!-- Dropdown -->
+                        <div
+                            class="absolute right-0 top-full mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 hidden group-hover:block transition-all transform origin-top-right z-50">
+                            <a href="<?= $base_url ?>profile/update-profile.php"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors">
+                                <i class="fas fa-user-circle text-slate-400"></i> Update Profile
+                            </a>
+                            <a href="<?= $base_url ?>profile/change-password.php"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-50 text-sm font-bold text-slate-600 hover:text-slate-900 transition-colors">
+                                <i class="fas fa-key text-slate-400"></i> Change Password
+                            </a>
+                            <div class="h-px bg-slate-100 my-1"></div>
+                            <a href="<?= $base_url ?>logout.php"
+                                class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-sm font-bold text-red-500 hover:text-red-600 transition-colors">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
