@@ -1,43 +1,69 @@
 <?php
-$base_path = $_SERVER['DOCUMENT_ROOT'] . '/ecommerce-website/';
-require_once $base_path . "config/database.php";
-include $base_path . 'includes/admin-header.php';
-include $base_path . 'includes/sidebar.php';
+require_once __DIR__ . '/loader.php'; // Handles Config, DB, Functions, Session
+
+// Use PROJECT_ROOT defined in loader.php
+include PROJECT_ROOT . '/includes/admin-header.php';
+include PROJECT_ROOT . '/includes/sidebar.php';
+
+use Core\Database;
+use Core\Cache;
 
 if (!has_permission('dashboard')) {
     echo "<h1>Access Denied</h1><p>Contact Administrator.</p>";
     exit;
 }
 
-// 1. Fetch Key Metrics
-$today_sales = $pdo->query("SELECT SUM(total_amount) FROM orders WHERE DATE(created_at) = CURDATE() AND order_status != 'cancelled'")->fetchColumn() ?? 0;
-$today_orders = $pdo->query("SELECT COUNT(*) FROM orders WHERE DATE(created_at) = CURDATE()")->fetchColumn() ?? 0;
-$new_customers = $pdo->query("SELECT COUNT(*) FROM users WHERE DATE(created_at) = CURDATE() AND role = 'retail'")->fetchColumn() ?? 0;
-$low_stock_count = $pdo->query("SELECT COUNT(*) FROM products WHERE stock <= min_stock_level AND status = 1")->fetchColumn() ?? 0;
+$db = Database::getInstance()->getConnection();
+$cache = new Cache();
+$cacheKey = 'admin_dashboard_stats';
 
-// 2. Fetch Order Status Counts
-$status_counts = $pdo->query("SELECT order_status, COUNT(*) as qty FROM orders GROUP BY order_status")->fetchAll(PDO::FETCH_KEY_PAIR);
+// Check if hard refresh requested
+if (isset($_GET['refresh'])) {
+    $cache->delete($cacheKey);
+}
 
-// 3. Recent Logistics (Orders)
-$recent_orders = $pdo->query("SELECT o.*, u.name as customer_name, u.city 
-                             FROM orders o 
-                             JOIN users u ON o.user_id = u.user_id 
-                             ORDER BY o.created_at DESC LIMIT 5")->fetchAll();
+$stats = $cache->get($cacheKey);
 
-// 4. Stock Alerts
-$stock_alerts = $pdo->query("SELECT name, stock FROM products WHERE stock <= min_stock_level AND status = 1 LIMIT 5")->fetchAll();
+if (!$stats) {
+    // 1. Fetch Key Metrics
+    $today_sales = $db->query("SELECT SUM(total_amount) FROM orders WHERE DATE(created_at) = CURDATE() AND order_status != 'cancelled'")->fetchColumn() ?? 0;
+    $today_orders = $db->query("SELECT COUNT(*) FROM orders WHERE DATE(created_at) = CURDATE()")->fetchColumn() ?? 0;
+    $new_customers = $db->query("SELECT COUNT(*) FROM users WHERE DATE(created_at) = CURDATE() AND role = 'retail'")->fetchColumn() ?? 0;
+    $low_stock_count = $db->query("SELECT COUNT(*) FROM products WHERE stock <= min_stock_level AND status = 1")->fetchColumn() ?? 0;
 
-// 5. Payment Pulse
-$online_received = $pdo->query("SELECT SUM(total_amount) FROM orders WHERE payment_method = 'online' AND payment_status = 'paid'")->fetchColumn() ?? 0;
-$cod_pending = $pdo->query("SELECT SUM(total_amount) FROM orders WHERE payment_method = 'cod' AND payment_status = 'pending'")->fetchColumn() ?? 0;
-$refunded = $pdo->query("SELECT SUM(total_amount) FROM orders WHERE order_status = 'returned'")->fetchColumn() ?? 0;
+    // 2. Fetch Order Status Counts
+    $status_counts = $db->query("SELECT order_status, COUNT(*) as qty FROM orders GROUP BY order_status")->fetchAll(PDO::FETCH_KEY_PAIR);
 
-// 6. Chart Data (Last 7 Days)
-$chart_data = $pdo->query("SELECT DATE_FORMAT(created_at, '%a') as day, SUM(total_amount) as total 
-                          FROM orders 
-                          WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
-                          GROUP BY DATE(created_at) 
-                          ORDER BY created_at ASC")->fetchAll(PDO::FETCH_KEY_PAIR);
+    // 3. Recent Logistics (Orders) names join
+    $recent_orders = $db->query("SELECT o.*, u.name as customer_name, u.city 
+                                 FROM orders o 
+                                 JOIN users u ON o.user_id = u.user_id 
+                                 ORDER BY o.created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+
+    // 4. Stock Alerts
+    $stock_alerts = $db->query("SELECT name, stock FROM products WHERE stock <= min_stock_level AND status = 1 LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+
+    // 5. Payment Pulse
+    $online_received = $db->query("SELECT SUM(total_amount) FROM orders WHERE payment_method = 'online' AND payment_status = 'paid'")->fetchColumn() ?? 0;
+    $cod_pending = $db->query("SELECT SUM(total_amount) FROM orders WHERE payment_method = 'cod' AND payment_status = 'pending'")->fetchColumn() ?? 0;
+    $refunded = $db->query("SELECT SUM(total_amount) FROM orders WHERE order_status = 'returned'")->fetchColumn() ?? 0;
+
+    // 6. Chart Data
+    $chart_data = $db->query("SELECT DATE_FORMAT(created_at, '%a') as day, SUM(total_amount) as total 
+                              FROM orders 
+                              WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 6 DAY)
+                              GROUP BY DATE(created_at) 
+                              ORDER BY created_at ASC")->fetchAll(PDO::FETCH_KEY_PAIR);
+
+    $stats = compact('today_sales', 'today_orders', 'new_customers', 'low_stock_count', 'status_counts', 'recent_orders', 'stock_alerts', 'online_received', 'cod_pending', 'refunded', 'chart_data');
+
+    // Cache for 5 minutes
+    $cache->set($cacheKey, $stats, 300);
+} else {
+    extract($stats);
+}
+
+// Chart Prep
 $days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 $sales_points = [];
 foreach ($days as $day) {
@@ -47,11 +73,15 @@ foreach ($days as $day) {
 
 <main class="p-4 md:p-10 flex-1">
     <div class="md:hidden mb-6">
-        <div class="flex items-center gap-3 bg-white border border-slate-200 px-4 py-3 rounded-2xl shadow-sm">
+        <div class="flex items-center gap-3 bg-white border border-slate-200 px-4 py-3 rounded-2xl shadow-sm flex-1">
             <i class="fas fa-search text-slate-400"></i>
             <input type="text" placeholder="Search system..."
                 class="bg-transparent outline-none text-sm font-semibold w-full">
         </div>
+        <a href="?refresh=true"
+            class="bg-orange-50 text-orange-600 p-3 rounded-xl hover:bg-orange-600 hover:text-white transition-all">
+            <i class="fas fa-sync-alt"></i>
+        </a>
     </div>
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

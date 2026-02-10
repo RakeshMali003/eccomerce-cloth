@@ -1,13 +1,26 @@
 <?php
 session_start();
-require_once $_SERVER['DOCUMENT_ROOT'] . '/ecommerce-website/config/database.php';
+require_once __DIR__ . '/../../includes/functions.php'; // Includes Core classes
+require_once __DIR__ . '/../../core/RateLimiter.php';
+
+use Core\Database;
+use Core\RateLimiter;
+
+$db = Database::getInstance()->getConnection();
+$limiter = new RateLimiter();
+$ip = $_SERVER['REMOTE_ADDR'];
 $error = "";
+
+// MAX 5 Attempts per minute
+if (!$limiter->check($ip, 5, 60)) {
+    die("<h1>Too Many Attempts</h1><p>Please wait 1 minute before trying again.</p>");
+}
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $id = $_POST['identifier']; // This can be email or phone
     $pass = $_POST['password'];
 
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ? OR phone = ?");
+    $stmt = $db->prepare("SELECT * FROM users WHERE email = ? OR phone = ?");
     $stmt->execute([$id, $id]);
     $user = $stmt->fetch();
 
@@ -45,7 +58,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <?php if ($error): ?>
             <div
                 class="bg-orange-50 text-orange-600 p-4 rounded-2xl mb-6 text-xs font-bold uppercase text-center border border-orange-100">
-                <?php echo $error; ?></div>
+                <?php echo $error; ?>
+            </div>
         <?php endif; ?>
 
         <form action="" method="POST" class="space-y-4">

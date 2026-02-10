@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once $_SERVER['DOCUMENT_ROOT'] . '/ecommerce-website/config/database.php';
+require_once __DIR__ . '/loader.php';
 
 $error = "";
 

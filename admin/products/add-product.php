@@ -1,5 +1,5 @@
 <?php
-$base_path = $_SERVER['DOCUMENT_ROOT'] . '/ecommerce-website/';
+$base_path = __DIR__ . '/../../';
 require_once $base_path . 'config/database.php';
 include $base_path . 'includes/admin-header.php';
 include $base_path . 'includes/sidebar.php';

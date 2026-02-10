@@ -4,11 +4,24 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 require_once __DIR__ . '/functions.php';
 
+// Define base path if not defined
+if (!defined('BASE_PATH')) {
+    define('BASE_PATH', dirname(__DIR__) . '/');
+}
+
+// Include Config First (defines BASE_URL)
+if (!defined('BASE_URL')) {
+    $config_path = BASE_PATH . 'config/config.php';
+    if (file_exists($config_path)) {
+        require_once $config_path;
+    }
+}
+
 // Ensure database connection is available
 if (!isset($pdo)) {
-    $base_path = $_SERVER['DOCUMENT_ROOT'] . '/ecommerce-website/';
-    if (file_exists($base_path . 'config/database.php')) {
-        require_once $base_path . 'config/database.php';
+    $db_path = BASE_PATH . 'config/database.php';
+    if (file_exists($db_path)) {
+        require_once $db_path;
     }
 }
 
@@ -122,8 +135,7 @@ if (isset($pdo)) {
         <div class="container mx-auto px-4 relative z-10">
             <p class="text-[10px] md:text-xs font-black uppercase tracking-[0.2em] text-center animate-pulse">
                 <i class="fas fa-star text-white mr-2"></i> Official Wholesale Distributor of <span
-                    class="bg-black text-yellow-500 px-2 rounded">HPL</span> <span class="mx-1">&</span> <span
-                    class="bg-black text-yellow-500 px-2 rounded">HCL</span> & Anchor
+                    class="bg-black text-yellow-500 px-2 rounded">HPL</span> & Anchor
                 <span class="hidden md:inline mx-2">|</span>
                 <span class="hidden md:inline border-l border-black pl-2">Bulk & Project Orders Welcome</span>
             </p>
@@ -135,7 +147,7 @@ if (isset($pdo)) {
         <div class="hidden md:block">⚡ Powering Your World Safely Since 1995</div>
         <div class="flex gap-6 mx-auto md:mx-0">
             <a href="<?php echo $base_url; ?>pages/become-dealer.php"
-                class="hover:text-orange-400 text-yellow-500 font-bold">Become a Dealer</a>
+                class="hover:text-orange-400 text-yellow-500 font-bold">Partner With Us</a>
             <a href="<?php echo $base_url; ?>pages/orders/order-tracking.php" class="hover:text-orange-400">Track
                 Order</a>
             <a href="#" class="hover:text-orange-400">Help Center</a>

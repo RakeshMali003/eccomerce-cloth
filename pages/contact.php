@@ -39,7 +39,7 @@ require_once '../includes/cms_helper.php';
                             <div>
                                 <h4 class="font-bold text-sm">Call Us</h4>
                                 <p class="text-gray-500 text-sm">
-                                    <?= get_cms_content('contact', 'phone', '6386517300, 9956510247') ?>
+                                    <?= get_cms_content('contact', 'phone', '6386517300, 9956510247, 7007465665') ?>
                                 </p>
                             </div>
                         </div>
@@ -58,7 +58,7 @@ require_once '../includes/cms_helper.php';
                         </div>
                     </div>
 
-                    <a href="https://wa.me/91<?= preg_replace('/\D/', '', explode(',', get_cms_content('contact', 'phone', '9956510247'))[0]) ?>"
+                    <a href="https://wa.me/917007465665"
                         class="mt-8 flex items-center justify-center gap-2 bg-[#25D366] text-white py-4 rounded-xl font-bold hover:opacity-90 transition-all">
                         <i class="fab fa-whatsapp text-xl"></i> Chat on WhatsApp
                     </a>

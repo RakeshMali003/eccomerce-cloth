@@ -7,6 +7,9 @@ Options +FollowSymLinks
 # Default charset
 AddDefaultCharset UTF-8
 
+# Uncomment the following line to enable error display on live server (if config.php method doesn't work)
+# php_flag display_errors on
+
 # Protect sensitive files
 <FilesMatch "^\.env|config\.php|composer\.json|package\.json">
     Order allow,deny

@@ -1,11 +1,18 @@
 <?php
-require_once '../../config/database.php';
+require_once '../../config/config.php';
+require_once '../../includes/functions.php'; // Includes Core DB & Cache
 include '../../includes/header.php';
+
+use Core\Database;
+use Core\Cache;
+
+$db = Database::getInstance()->getConnection();
+$cache = new Cache();
 
 $product_id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
-// Handle Review Submission
+// Handle Review Submission (Clear Cache on Submit)
 $success_msg = '';
 $error_msg = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review']) && $user_id) {
@@ -13,8 +20,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review']) && $
     $review_text = trim($_POST['review_text']);
 
     if ($rating >= 1 && $rating <= 5) {
-        $stmt = $pdo->prepare("INSERT INTO product_reviews (product_id, user_id, rating, review_text) VALUES (?, ?, ?, ?)");
+        $stmt = $db->prepare("INSERT INTO product_reviews (product_id, user_id, rating, review_text) VALUES (?, ?, ?, ?)");
         $stmt->execute([$product_id, $user_id, $rating, $review_text]);
+        
+        // Clear caches so new review shows up
+        $cache->delete("product_reviews_$product_id");
+        $cache->delete("product_$product_id"); // Update if avg rating is stored on product
+        
         $success_msg = "Review submitted successfully!";
         echo "<script>window.location.href='product-details.php?id=$product_id';</script>";
         exit;
@@ -23,10 +35,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_review']) && $
     }
 }
 
-// Fetch Product
-$stmt = $pdo->prepare("SELECT * FROM products WHERE product_id = ? AND status = 1");
-$stmt->execute([$product_id]);
-$product = $stmt->fetch(PDO::FETCH_ASSOC);
+// 1. Fetch Product (Cached)
+$cacheKey = "product_$product_id";
+$product = $cache->get($cacheKey);
+
+if (!$product) {
+    $stmt = $db->prepare("SELECT * FROM products WHERE product_id = ? AND status = 1");
+    $stmt->execute([$product_id]);
+    $product = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if ($product) {
+        $cache->set($cacheKey, $product, 3600); // 1 Hour Cache
+    }
+}
 
 if (!$product) {
     echo "<div class='container mx-auto py-20 text-center'><h2 class='text-2xl font-bold'>Product not found</h2><a href='product-list.php' class='text-orange-600 hover:underline mt-4 block'>Back to Products</a></div>";
@@ -34,16 +55,22 @@ if (!$product) {
     exit;
 }
 
-// Fetch Reviews
-$stmt_reviews = $pdo->prepare("
-    SELECT r.*, u.name as full_name 
-    FROM product_reviews r 
-    JOIN users u ON r.user_id = u.user_id 
-    WHERE r.product_id = ? 
-    ORDER BY r.created_at DESC
-");
-$stmt_reviews->execute([$product_id]);
-$reviews = $stmt_reviews->fetchAll(PDO::FETCH_ASSOC);
+// 2. Fetch Reviews (Cached)
+$reviewCacheKey = "product_reviews_$product_id";
+$reviews = $cache->get($reviewCacheKey);
+
+if (!$reviews) {
+    $stmt_reviews = $db->prepare("
+        SELECT r.*, u.name as full_name 
+        FROM product_reviews r 
+        JOIN users u ON r.user_id = u.user_id 
+        WHERE r.product_id = ? 
+        ORDER BY r.created_at DESC
+    ");
+    $stmt_reviews->execute([$product_id]);
+    $reviews = $stmt_reviews->fetchAll(PDO::FETCH_ASSOC);
+    $cache->set($reviewCacheKey, $reviews, 3600);
+}
 
 // Calculate Average Rating
 $avg_rating = 0;
@@ -55,10 +82,10 @@ if ($review_count > 0) {
     $avg_rating = round($sum / $review_count, 1);
 }
 
-// Check Wishlist Status
+// Check Wishlist Status (Cannot Cache globally, user specific)
 $in_wishlist = false;
 if ($user_id) {
-    $stmt_w = $pdo->prepare("SELECT 1 FROM wishlist WHERE user_id = ? AND product_id = ?");
+    $stmt_w = $db->prepare("SELECT 1 FROM wishlist WHERE user_id = ? AND product_id = ?");
     $stmt_w->execute([$user_id, $product_id]);
     $in_wishlist = $stmt_w->fetchColumn();
 }
@@ -261,9 +288,15 @@ if ($user_id) {
             <h3 class="text-3xl font-black text-zinc-900 mb-10">Similar Products</h3>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
                 <?php
-                $stmt_sim = $pdo->prepare("SELECT * FROM products WHERE category_id = ? AND product_id != ? AND status = 1 LIMIT 4");
-                $stmt_sim->execute([$product['category_id'], $product_id]);
-                $similar = $stmt_sim->fetchAll();
+                $simCacheKey = "similar_prod_" . $product['category_id'] . "_" . $product_id;
+                $similar = $cache->get($simCacheKey);
+
+                if (!$similar) {
+                    $stmt_sim = $db->prepare("SELECT * FROM products WHERE category_id = ? AND product_id != ? AND status = 1 LIMIT 4");
+                    $stmt_sim->execute([$product['category_id'], $product_id]);
+                    $similar = $stmt_sim->fetchAll();
+                    $cache->set($simCacheKey, $similar, 3600);
+                }
                 
                 if($similar):
                     foreach($similar as $sim):

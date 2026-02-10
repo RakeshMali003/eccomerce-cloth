@@ -1,6 +1,6 @@
 <?php
 
-$base_path = $_SERVER['DOCUMENT_ROOT'] . '/ecommerce-website/';
+$base_path = __DIR__ . '/../../';
 
 
     include $base_path . 'includes/sidebar.php'; 

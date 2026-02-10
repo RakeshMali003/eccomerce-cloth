@@ -62,7 +62,7 @@
                     for homes, shops, and projects.
                 </p>
                 <div class="flex gap-4">
-                    <a href="https://wa.me/919956510247"
+                    <a href="https://wa.me/917007465665"
                         class="w-10 h-10 rounded-full bg-zinc-900 flex items-center justify-center hover:bg-yellow-500 hover:text-black transition-all duration-300">
                         <i class="fab fa-whatsapp text-sm"></i>
                     </a>
@@ -123,7 +123,7 @@
             </p>
         </div>
     </div>
-    <a href="https://wa.me/919956510247"
+    <a href="https://wa.me/917007465665"
         class="fixed bottom-8 right-8 bg-[#25D366] text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl shadow-2xl hover:scale-110 transition-transform z-[100]">
         <i class="fab fa-whatsapp"></i>
     </a>

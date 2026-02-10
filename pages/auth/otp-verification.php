@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'] . '/ecommerce-website/config/database.php';
+require_once __DIR__ . '/../../config/database.php';
 
 $email = $_GET['email'] ?? '';
 $error = "";

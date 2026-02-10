@@ -4,19 +4,39 @@ require_once 'config/database.php';
 require_once 'config/config.php';
 require_once 'includes/functions.php';
 require_once 'includes/cms_helper.php';
+require_once 'core/Database.php';
+require_once 'core/Cache.php';
+
+use Core\Database;
+use Core\Cache;
 
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 include 'includes/header.php';
 
-// Fetch new electrical arrivals
-$new_arrivals = $pdo->query("
-    SELECT p.*, c.name as category_name 
-    FROM products p 
-    LEFT JOIN categories c ON p.category_id = c.category_id 
-    WHERE p.status = 'active' 
-    ORDER BY p.created_at DESC 
-    LIMIT 8
-")->fetchAll();
+// Initialize Core Components
+$db = Database::getInstance()->getConnection();
+$cache = new Cache();
+
+// Fetch new electrical arrivals (Cached for 10 minutes)
+$cacheKey = 'home_new_arrivals';
+$new_arrivals = $cache->get($cacheKey);
+
+if (!$new_arrivals) {
+    // Cache Miss: Query DB
+    $stmt = $db->query("
+        SELECT p.*, c.name as category_name 
+        FROM products p 
+        LEFT JOIN categories c ON p.category_id = c.category_id 
+        WHERE p.status = 'active' 
+        ORDER BY p.created_at DESC 
+        LIMIT 8
+    ");
+    $new_arrivals = $stmt->fetchAll();
+
+    // Save to Cache
+    $cache->set($cacheKey, $new_arrivals, 600);
+}
+
 ?>
 
 <main class="bg-[#fafafa] pb-20">
@@ -33,7 +53,7 @@ $new_arrivals = $pdo->query("
             </div>
             <a href="pages/wholesale.php"
                 class="bg-black text-white px-6 py-1 rounded-full text-xs font-bold hover:bg-white hover:text-black transition-all uppercase tracking-widest">
-                Check Dealer Rates
+                Check Partner Rates
             </a>
         </div>
     </section>
@@ -116,7 +136,7 @@ $new_arrivals = $pdo->query("
             <div class="bg-white p-6 rounded-2xl flex items-center gap-4 shadow-sm border border-gray-100">
                 <div class="text-yellow-600 text-2xl"><i class="fas fa-certificate"></i></div>
                 <div>
-                    <h5 class="text-sm font-bold">Authorized Dealer</h5>
+                    <h5 class="text-sm font-bold">Authorized Partner</h5>
                     <p class="text-[10px] text-gray-400 uppercase tracking-tighter">HPL & Anchor</p>
                 </div>
             </div>
@@ -417,7 +437,7 @@ $new_arrivals = $pdo->query("
                         </p>
                         <p class="flex items-center gap-4">
                             <i class="fas fa-phone-alt text-yellow-500"></i>
-                            <span>+91 99565 10247</span>
+                            <span>+91 99565 10247, +91 7007465665</span>
                         </p>
                         <p class="flex items-center gap-4">
                             <i class="fas fa-clock text-yellow-500"></i>
@@ -426,7 +446,7 @@ $new_arrivals = $pdo->query("
                     </div>
                 </div>
                 <div class="flex gap-4">
-                    <a href="https://wa.me/919956510247"
+                    <a href="https://wa.me/917007465665"
                         class="bg-[#25D366] text-white px-8 py-4 rounded-xl font-bold flex items-center gap-2 hover:opacity-90 transition-all">
                         <i class="fab fa-whatsapp text-lg"></i> WhatsApp Us
                     </a>

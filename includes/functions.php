@@ -1,5 +1,9 @@
 <?php
 // Security Helper
+require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/../core/Cache.php';
+
 function e($string)
 {
     return htmlspecialchars($string, ENT_QUOTES, 'UTF-8');
@@ -33,7 +37,7 @@ function get_product_image($image_path)
         $image_path = $base_dir . $image_path;
     }
 
-    if (!empty($image_path) && file_exists($_SERVER['DOCUMENT_ROOT'] . '/ecommerce-website/' . $image_path)) {
+    if (!empty($image_path) && file_exists(__DIR__ . '/../' . $image_path)) {
         return BASE_URL . $image_path;
     }
     return 'https://via.placeholder.com/600x800?text=No+Image';
@@ -51,11 +55,9 @@ function get_user_initial()
     return isset($_SESSION['user_name']) ? strtoupper(substr($_SESSION['user_name'], 0, 1)) : 'U';
 }
 
-// Permission Helper
+// Permission Helper (Cached)
 function has_permission($permission)
 {
-    global $pdo;
-
     if (!isset($_SESSION['user_id']) && !isset($_SESSION['admin_id']))
         return false;
 
@@ -68,39 +70,48 @@ function has_permission($permission)
     if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin')
         return true;
 
-    // Fetch Permissions if not in session
+    // Fetch Permissions if not in session (Use Singleton DB)
     if (!isset($_SESSION['permissions'])) {
-        $stmt = $pdo->prepare("SELECT permissions FROM workers WHERE user_id = ?");
+        $db = \Core\Database::getInstance()->getConnection();
+        $stmt = $db->prepare("SELECT permissions FROM workers WHERE user_id = ?");
         $stmt->execute([$_SESSION['user_id']]);
         $perms = $stmt->fetchColumn();
-        if ($perms) {
-            $_SESSION['permissions'] = json_decode($perms, true) ?? [];
-        } else {
-            $_SESSION['permissions'] = [];
-        }
+        $_SESSION['permissions'] = $perms ? json_decode($perms, true) : [];
     }
 
     return in_array($permission, $_SESSION['permissions']);
 }
 
-// Cart Count Helper
+// Cart Count Helper (Cached in Session)
 function get_cart_count()
 {
-    global $pdo;
     if (!isset($_SESSION['user_id']))
         return 0;
-    $stmt = $pdo->prepare("SELECT SUM(quantity) FROM cart WHERE user_id = ?");
+
+    // Check Session Cache first (avoid DB on every refresh)
+    if (isset($_SESSION['cart_count_cache']) && (time() - $_SESSION['cart_last_check'] < 60)) {
+        return $_SESSION['cart_count_cache'];
+    }
+
+    $db = \Core\Database::getInstance()->getConnection();
+    $stmt = $db->prepare("SELECT SUM(quantity) FROM cart WHERE user_id = ?");
     $stmt->execute([$_SESSION['user_id']]);
-    return (int) $stmt->fetchColumn();
+    $count = (int) $stmt->fetchColumn();
+
+    $_SESSION['cart_count_cache'] = $count;
+    $_SESSION['cart_last_check'] = time();
+
+    return $count;
 }
 
 // Wishlist Count Helper
 function get_wishlist_count()
 {
-    global $pdo;
     if (!isset($_SESSION['user_id']))
         return 0;
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM wishlist WHERE user_id = ?");
+
+    $db = \Core\Database::getInstance()->getConnection();
+    $stmt = $db->prepare("SELECT COUNT(*) FROM wishlist WHERE user_id = ?");
     $stmt->execute([$_SESSION['user_id']]);
     return (int) $stmt->fetchColumn();
 }

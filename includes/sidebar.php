@@ -1,6 +1,6 @@
 <?php
 $current_page = basename($_SERVER['PHP_SELF']);
-$base_url = BASE_URL . 'admin/';
+$base_url = ADMIN_URL;
 ?>
 <aside
     class="w-72 bg-white h-screen fixed left-0 top-0 border-r border-slate-100 flex-col z-[100] sidebar-scroll overflow-y-auto font-sans hidden lg:flex">

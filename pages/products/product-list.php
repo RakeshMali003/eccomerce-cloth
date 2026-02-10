@@ -1,59 +1,90 @@
 <?php
-require_once '../../config/database.php';
-require_once '../../includes/functions.php';
+require_once '../../config/config.php';
+require_once '../../includes/functions.php'; // Includes Core DB & Cache
 include '../../includes/header.php';
 
-// Fetch categories for sidebar
-$stmt_cats = $pdo->query("SELECT * FROM categories ORDER BY name ASC");
-$categories = $stmt_cats->fetchAll(PDO::FETCH_ASSOC);
+use Core\Database;
+use Core\Cache;
 
-// Base SQL
-$sql = "SELECT p.*, c.name as category_name 
-        FROM products p 
-        LEFT JOIN categories c ON p.category_id = c.category_id 
-        WHERE p.status = 1";
+$db = Database::getInstance()->getConnection();
+$cache = new Cache();
 
-// Filter by Category
+// 1. Fetch Categories & Counts (Optimized via Cache + GROUP BY)
+$catCacheKey = 'categories_with_counts';
+$categories = $cache->get($catCacheKey);
+
+if (!$categories) {
+    // Single query to get categories AND their active product counts
+    // Prevents N+1 Query Problem
+    $sql = "SELECT c.*, COUNT(p.product_id) as product_count 
+            FROM categories c 
+            LEFT JOIN products p ON c.category_id = p.category_id AND p.status = 1 
+            GROUP BY c.category_id 
+            ORDER BY c.name ASC";
+    $categories = $db->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    $cache->set($catCacheKey, $categories, 600); // 10 mins cache
+}
+
+// 2. Product Filtering Logic
 $category_filter_id = isset($_GET['category_id']) ? (int) $_GET['category_id'] : null;
-if ($category_filter_id) {
-    $sql .= " AND p.category_id = :cat_id";
-}
-
-// Search Filter
 $search_query = isset($_GET['search']) ? trim($_GET['search']) : null;
-if ($search_query) {
-    $sql .= " AND (p.name LIKE :search1 OR p.description LIKE :search2 OR p.sku LIKE :search3)";
-}
-
-// Sorting logic
 $sort_option = $_GET['sort'] ?? 'newest';
-switch ($sort_option) {
-    case 'price_low':
-        $sql .= " ORDER BY p.price ASC";
-        break;
-    case 'price_high':
-        $sql .= " ORDER BY p.price DESC";
-        break;
-    case 'best_seller':
-        // Assuming we track sales or just random for now if not tracked
-        $sql .= " ORDER BY p.stock ASC"; // Just a proxy
-        break;
-    default:
-        $sql .= " ORDER BY p.created_at DESC";
+
+// Generate Cache Key for this specific view
+$cacheKey = "products_list_" . md5(json_encode($_GET));
+$products = $cache->get($cacheKey);
+
+if (!$products) {
+    $sql = "SELECT p.*, c.name as category_name 
+            FROM products p 
+            LEFT JOIN categories c ON p.category_id = c.category_id 
+            WHERE p.status = 1";
+
+    $params = [];
+
+    if ($category_filter_id) {
+        $sql .= " AND p.category_id = :cat_id";
+        $params[':cat_id'] = $category_filter_id;
+    }
+
+    if ($search_query) {
+        $sql .= " AND (p.name LIKE :search OR p.description LIKE :search OR p.sku LIKE :search)";
+        $params[':search'] = "%$search_query%";
+    }
+
+    // Sorting
+    switch ($sort_option) {
+        case 'price_low':
+            $sql .= " ORDER BY p.price ASC";
+            break;
+        case 'price_high':
+            $sql .= " ORDER BY p.price DESC";
+            break;
+        case 'best_seller':
+            $sql .= " ORDER BY p.stock ASC";
+            break;
+        default:
+            $sql .= " ORDER BY p.created_at DESC";
+    }
+
+    $sql .= " LIMIT 50"; // Hard limit for safety
+
+    $stmt = $db->prepare($sql);
+    $stmt->execute($params);
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Cache search results for 5 minutes
+    $cache->set($cacheKey, $products, 300);
 }
 
-$stmt = $pdo->prepare($sql);
-if ($category_filter_id) {
-    $stmt->bindValue(':cat_id', $category_filter_id, PDO::PARAM_INT);
-}
-if ($search_query) {
-    $stmt->bindValue(':search1', "%$search_query%", PDO::PARAM_STR);
-    $stmt->bindValue(':search2', "%$search_query%", PDO::PARAM_STR);
-    $stmt->bindValue(':search3', "%$search_query%", PDO::PARAM_STR);
-}
-$stmt->execute();
-$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $total_products = count($products);
+$total_all_sql = "SELECT COUNT(*) FROM products WHERE status=1";
+// We can cache the total count too efficiently
+$total_designs = $cache->get('total_products_count');
+if (!$total_designs) {
+    $total_designs = $db->query($total_all_sql)->fetchColumn();
+    $cache->set('total_products_count', $total_designs, 3600);
+}
 ?>
 
 <body class="bg-[#FBFBFB]">
@@ -83,20 +114,15 @@ $total_products = count($products);
                                 <a href="product-list.php"
                                     class="flex justify-between items-center transition <?= !$category_filter_id ? 'text-orange-600' : 'hover:text-orange-600' ?>">
                                     All Products
-                                    <span>(<?= $pdo->query("SELECT COUNT(*) FROM products WHERE status=1")->fetchColumn() ?>)</span>
+                                    <span>(<?= $total_designs ?>)</span>
                                 </a>
                             </li>
-                            <?php foreach ($categories as $cat):
-                                // Get count per category
-                                $count_stmt = $pdo->prepare("SELECT COUNT(*) FROM products WHERE category_id = ? AND status=1");
-                                $count_stmt->execute([$cat['category_id']]);
-                                $count = $count_stmt->fetchColumn();
-                                ?>
+                            <?php foreach ($categories as $cat): ?>
                                 <li>
                                     <a href="?category_id=<?= $cat['category_id'] ?>"
                                         class="flex justify-between items-center transition <?= ($category_filter_id == $cat['category_id']) ? 'text-orange-600' : 'hover:text-orange-600' ?>">
                                         <?= htmlspecialchars($cat['name']) ?>
-                                        <span>(<?= $count ?>)</span>
+                                        <span>(<?= $cat['product_count'] ?>)</span>
                                     </a>
                                 </li>
                             <?php endforeach; ?>
@@ -209,11 +235,11 @@ $total_products = count($products);
                 <div class="mt-24 flex flex-col items-center">
                     <p class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-6">
                         Viewing <?= $total_products ?> of
-                        <?= $pdo->query("SELECT COUNT(*) FROM products WHERE status=1")->fetchColumn() ?> Designs
+                        <?= $total_designs ?> Designs
                     </p>
                     <div class="w-64 h-1 bg-zinc-200 rounded-full mb-8 overflow-hidden">
                         <?php
-                        $total_all = $pdo->query("SELECT COUNT(*) FROM products WHERE status=1")->fetchColumn();
+                        $total_all = $total_designs;
                         $percentage = ($total_all > 0) ? ($total_products / $total_all) * 100 : 0;
                         ?>
                         <div class="bg-zinc-900 h-full transition-all" style="width: <?= $percentage ?>%"></div>

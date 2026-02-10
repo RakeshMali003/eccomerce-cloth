@@ -72,14 +72,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit_application'])
                                 boost your shop's visibility.</p>
                         </div>
                     </div>
+                    <div class="bg-blue-50 p-6 rounded-[2rem] border border-blue-100">
+                        <h4 class="font-bold text-blue-800 mb-2"><i class="fas fa-info-circle mr-2"></i>Partnership
+                            Information</h4>
+                        <ul class="text-sm text-blue-700 space-y-2 list-disc list-inside">
+                            <li>We are directly connected with the company.</li>
+                            <li>A partner is someone who is in direct contact with the company.</li>
+                            <li>Partner selection/approval will be decided by the company, not by us.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
 
             <!-- Application Form -->
             <div class="w-full lg:w-1/2">
                 <div class="bg-white p-10 rounded-[2.5rem] shadow-xl border border-zinc-100">
-                    <h3 class="text-2xl font-black text-zinc-900 mb-2">Register as Dealer</h3>
-                    <p class="text-slate-400 text-sm font-medium mb-8">Join the network of successful electrical dealers
+                    <h3 class="text-2xl font-black text-zinc-900 mb-2">Register as Partner</h3>
+                    <p class="text-slate-400 text-sm font-medium mb-8">Join the network of successful electrical
+                        partners
                         with Joshi Electrical.</p>
 
                     <?php if (isset($success_msg)): ?>

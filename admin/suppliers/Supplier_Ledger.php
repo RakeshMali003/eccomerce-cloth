@@ -1,7 +1,7 @@
 <?php
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-$base_path = $_SERVER['DOCUMENT_ROOT'] . '/ecommerce-website/';
+$base_path = __DIR__ . '/../../';
 
 include $base_path . 'includes/sidebar.php'; 
 include $base_path . 'includes/notifications.php'; 

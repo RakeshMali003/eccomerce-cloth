@@ -7,14 +7,16 @@ require_once __DIR__ . '/functions.php';
 // Security Check: Only admins allowed
 if (!isset($_SESSION['admin_id'])) {
     // Determine the path back to login
+    // Determine the path back to login
     $request_uri = $_SERVER['REQUEST_URI'];
-    if (strpos($request_uri, '/admin/') !== false && basename($_SERVER['PHP_SELF']) !== 'index.php') {
-        header("Location: /ecommerce-website/admin/index.php");
+    // Allow access to login page
+    if (basename($_SERVER['PHP_SELF']) !== 'index.php') {
+        header("Location: " . ADMIN_URL . "index.php");
         exit();
     }
 }
 
-$base_url = BASE_URL . 'admin/';
+$base_url = ADMIN_URL;
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once $_SERVER['DOCUMENT_ROOT'] . '/ecommerce-website/config/database.php';
+require_once __DIR__ . '/../config/database.php';
 
 
 if (isset($_POST['register'])) {
@@ -18,7 +18,7 @@ if (isset($_POST['register'])) {
     $hashed_password = password_hash($password, PASSWORD_BCRYPT);
 
     $stmt = $pdo->prepare("INSERT INTO users (name, email, password, phone, role, status, created_at) VALUES (?, ?, ?, ?, 'retail', 'active', NOW())");
-    
+
     try {
         $stmt->execute([$name, $email, $hashed_password, $phone]);
         header("Location: login.php?success=Account created");

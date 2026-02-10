@@ -1,6 +1,6 @@
 <?php
 session_start();
-$base_path = $_SERVER['DOCUMENT_ROOT'] . '/ecommerce-website/';
+$base_path = __DIR__ . '/../../';
 require_once "../../config/database.php";
 
 if (!isset($_SESSION['user_id'])) {

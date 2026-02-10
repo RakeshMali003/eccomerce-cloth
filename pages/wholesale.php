@@ -31,13 +31,13 @@ require_once '../includes/cms_helper.php';
                 class="bg-yellow-500 text-black hover:bg-white px-8 py-4 rounded-xl font-bold transition-all flex items-center gap-2">
                 <i class="fas fa-file-pdf"></i> Request Pricelist
             </a>
-            <a href="https://wa.me/919956510247"
+            <a href="https://wa.me/917007465665"
                 class="bg-zinc-800 hover:bg-zinc-700 text-white px-8 py-4 rounded-xl font-bold transition-all flex items-center gap-2">
                 <i class="fab fa-whatsapp"></i> Contact Sales
             </a>
             <a href="#register"
-                class="bg-white text-black hover:bg-yellow-500 px-8 py-4 rounded-xl font-bold transition-all">Become
-                a Dealer</a>
+                class="bg-white text-black hover:bg-yellow-500 px-8 py-4 rounded-xl font-bold transition-all">Partner
+                With Us</a>
         </div>
     </div>
 </header>
@@ -186,7 +186,7 @@ require_once '../includes/cms_helper.php';
                 </ul>
                 <div class="p-6 bg-yellow-500 text-black rounded-2xl text-center">
                     <p class="text-xs font-bold uppercase tracking-[0.2em] mb-2">Ready to Start?</p>
-                    <h5 class="text-xl font-black">Get Dealer Price Check</h5>
+                    <h5 class="text-xl font-black">Get Partner Price Check</h5>
                     <a href="tel:6386517300"
                         class="mt-4 inline-block bg-black text-white px-6 py-2 rounded-lg font-bold hover:bg-white hover:text-black transition-all">Call
                         Now</a>
@@ -200,8 +200,8 @@ require_once '../includes/cms_helper.php';
     <div class="max-w-4xl mx-auto bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-zinc-100">
         <div class="flex flex-col md:flex-row">
             <div class="md:w-1/3 bg-zinc-900 p-12 text-white">
-                <h3 class="text-3xl font-sans font-bold mb-6">Register as Dealer</h3>
-                <p class="text-sm opacity-90 mb-8">Join the network of successful electrical dealers with Joshi
+                <h3 class="text-3xl font-sans font-bold mb-6">Register as Partner</h3>
+                <p class="text-sm opacity-90 mb-8">Join the network of successful electrical partners with Joshi
                     Electrical.
                 </p>
                 <div class="space-y-4 text-xs font-bold uppercase">
